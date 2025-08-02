@@ -1,0 +1,163 @@
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import {
+  $getSelection,
+  $isRangeSelection,
+  FORMAT_TEXT_COMMAND,
+  SELECTION_CHANGE_COMMAND,
+  $createParagraphNode,
+} from 'lexical'
+import { $setBlocksType } from '@lexical/selection'
+import {
+  $createHeadingNode,
+  HeadingTagType,
+} from '@lexical/rich-text'
+import { useCallback, useEffect, useState } from 'react'
+
+interface ToolbarState {
+  isBold: boolean
+  isItalic: boolean
+  isStrikethrough: boolean
+  isUnderline: boolean
+  blockType: string
+}
+
+export default function ToolbarPlugin() {
+  const [editor] = useLexicalComposerContext()
+  const [toolbarState, setToolbarState] = useState<ToolbarState>({
+    isBold: false,
+    isItalic: false,
+    isStrikethrough: false,
+    isUnderline: false,
+    blockType: 'paragraph',
+  })
+
+  const updateToolbar = useCallback(() => {
+    const selection = $getSelection()
+    if ($isRangeSelection(selection)) {
+      setToolbarState({
+        isBold: selection.hasFormat('bold'),
+        isItalic: selection.hasFormat('italic'),
+        isStrikethrough: selection.hasFormat('strikethrough'),
+        isUnderline: selection.hasFormat('underline'),
+        blockType: 'paragraph', // Simplified for now
+      })
+    }
+  }, [])
+
+  useEffect(() => {
+    return editor.registerCommand(
+      SELECTION_CHANGE_COMMAND,
+      () => {
+        updateToolbar()
+        return false
+      },
+      1,
+    )
+  }, [editor, updateToolbar])
+
+  const formatText = (format: 'bold' | 'italic' | 'strikethrough' | 'underline') => {
+    editor.dispatchCommand(FORMAT_TEXT_COMMAND, format)
+  }
+
+  const formatHeading = (headingSize: HeadingTagType) => {
+    editor.update(() => {
+      const selection = $getSelection()
+      if ($isRangeSelection(selection)) {
+        $setBlocksType(selection, () => $createHeadingNode(headingSize))
+      }
+    })
+  }
+
+  const formatParagraph = () => {
+    editor.update(() => {
+      const selection = $getSelection()
+      if ($isRangeSelection(selection)) {
+        $setBlocksType(selection, () => $createParagraphNode())
+      }
+    })
+  }
+
+  return (
+    <div className="toolbar">
+      <div className="toolbar-section">
+        <span className="toolbar-label">書式:</span>
+        <button
+          type="button"
+          className={`toolbar-button ${toolbarState.isBold ? 'active' : ''}`}
+          onClick={() => formatText('bold')}
+          aria-label="太字"
+        >
+          <strong>太</strong>
+        </button>
+        <button
+          type="button"
+          className={`toolbar-button ${toolbarState.isItalic ? 'active' : ''}`}
+          onClick={() => formatText('italic')}
+          aria-label="斜体"
+        >
+          <em>斜</em>
+        </button>
+        <button
+          type="button"
+          className={`toolbar-button ${toolbarState.isStrikethrough ? 'active' : ''}`}
+          onClick={() => formatText('strikethrough')}
+          aria-label="取り消し線"
+        >
+          <s>消</s>
+        </button>
+        <button
+          type="button"
+          className={`toolbar-button ${toolbarState.isUnderline ? 'active' : ''}`}
+          onClick={() => formatText('underline')}
+          aria-label="下線"
+        >
+          <u>線</u>
+        </button>
+      </div>
+      
+      <div className="toolbar-section">
+        <span className="toolbar-label">見出し:</span>
+        <button
+          type="button"
+          className="toolbar-button"
+          onClick={() => formatParagraph()}
+          aria-label="本文"
+        >
+          本文
+        </button>
+        <button
+          type="button"
+          className="toolbar-button"
+          onClick={() => formatHeading('h1')}
+          aria-label="見出し1"
+        >
+          H1
+        </button>
+        <button
+          type="button"
+          className="toolbar-button"
+          onClick={() => formatHeading('h2')}
+          aria-label="見出し2"
+        >
+          H2
+        </button>
+        <button
+          type="button"
+          className="toolbar-button"
+          onClick={() => formatHeading('h3')}
+          aria-label="見出し3"
+        >
+          H3
+        </button>
+        <button
+          type="button"
+          className="toolbar-button"
+          onClick={() => formatHeading('h4')}
+          aria-label="見出し4"
+        >
+          H4
+        </button>
+      </div>
+    </div>
+  )
+}

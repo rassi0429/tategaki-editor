@@ -29,7 +29,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className={styles.app}>
-        <main className={styles.appMain}>
+        <main>
           <Routes>
             <Route path="/" element={<DocumentListPage />} />
             <Route path="/edit/:id" element={<EditorPageWrapper />} />

@@ -20,10 +20,3 @@ export const app = style({
     flexDirection: "column"
 
 })
-
-export const appMain = style({
-    // flex: 1,
-    // display: "flex",
-    // justifyContent: "center",
-    // alignItems: "flex-start",
-})

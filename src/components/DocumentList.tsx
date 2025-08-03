@@ -72,17 +72,63 @@ const extractTextFromLexicalJSONStrSummary = (str: string) => {
   }
 }
 
+type SortKey = 'title' | 'createdAt' | 'updatedAt' | 'characterCount'
+type SortOrder = 'asc' | 'desc'
+type ViewMode = 'card' | 'table'
+
 export const DocumentList: React.FC<DocumentListProps> = ({
   onSelectDocument,
 }) => {
   const [documents, setDocuments] = useState<Document[]>([])
+  const [sortKey, setSortKey] = useState<SortKey>('updatedAt')
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
+  const [viewMode, setViewMode] = useState<ViewMode>('card')
 
   useEffect(() => {
     loadDocuments()
   }, [])
 
+  const getCharacterCount = (content: string): number => {
+    try {
+      const json = JSON.parse(content)
+      const text = extractTextFromLexicalJSON(json)
+      return text.length
+    } catch {
+      return 0
+    }
+  }
+
   const loadDocuments = () => {
-    setDocuments(getDocuments())
+    const docs = getDocuments()
+    const sortedDocs = [...docs].sort((a, b) => {
+      let aValue: string | number
+      let bValue: string | number
+
+      switch (sortKey) {
+        case 'title':
+          aValue = a.title
+          bValue = b.title
+          break
+        case 'createdAt':
+          aValue = new Date(a.createdAt).getTime()
+          bValue = new Date(b.createdAt).getTime()
+          break
+        case 'updatedAt':
+          aValue = new Date(a.updatedAt).getTime()
+          bValue = new Date(b.updatedAt).getTime()
+          break
+        case 'characterCount':
+          aValue = getCharacterCount(a.content)
+          bValue = getCharacterCount(b.content)
+          break
+      }
+
+      if (sortOrder === 'asc') {
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0
+      }
+      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0
+    })
+    setDocuments(sortedDocs)
   }
 
   const handleCreateNew = () => {
@@ -98,17 +144,59 @@ export const DocumentList: React.FC<DocumentListProps> = ({
     }
   }
 
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortKey(key)
+      setSortOrder('desc')
+    }
+  }
+
+  const getSortIcon = (key: SortKey) => {
+    if (sortKey !== key) return '↕'
+    return sortOrder === 'asc' ? '↑' : '↓'
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.title}>縦書きエディタ</div>
-        <button
-          type="button"
-          className={styles.newButton}
-          onClick={handleCreateNew}
-        >
-          新規作成
-        </button>
+        <div className={styles.headerActions}>
+          <div className={styles.viewToggle}>
+            <button
+              type="button"
+              className={
+                viewMode === 'card'
+                  ? styles.viewButtonActive
+                  : styles.viewButton
+              }
+              onClick={() => setViewMode('card')}
+              title="カード表示"
+            >
+              ▦
+            </button>
+            <button
+              type="button"
+              className={
+                viewMode === 'table'
+                  ? styles.viewButtonActive
+                  : styles.viewButton
+              }
+              onClick={() => setViewMode('table')}
+              title="テーブル表示"
+            >
+              ☰
+            </button>
+          </div>
+          <button
+            type="button"
+            className={styles.newButton}
+            onClick={handleCreateNew}
+          >
+            新規作成
+          </button>
+        </div>
       </div>
 
       {documents.length === 0 ? (
@@ -125,38 +213,153 @@ export const DocumentList: React.FC<DocumentListProps> = ({
             最初の文書を作成
           </button>
         </div>
-      ) : (
+      ) : viewMode === 'card' ? (
         <div className={styles.documentGrid}>
-          {documents.map((doc) => (
-            <div
-              key={doc.id}
-              className={styles.documentCard}
-              onClick={() => onSelectDocument(doc.id)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  onSelectDocument(doc.id)
-                }
-              }}
-            >
-              <button
-                type="button"
-                className={styles.deleteButton}
-                onClick={(e) => handleDelete(e, doc.id)}
+          {documents.map((doc) => {
+            const charCount = getCharacterCount(doc.content)
+            const preview = extractTextFromLexicalJSONStrSummary(doc.content)
+            return (
+              <div
+                key={doc.id}
+                className={styles.documentCard}
+                onClick={() => onSelectDocument(doc.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    onSelectDocument(doc.id)
+                  }
+                }}
               >
-                削除
-              </button>
-              <h3 className={styles.documentTitle}>{doc.title}</h3>
-              <p className={styles.summaryText}>
-                {extractTextFromLexicalJSONStrSummary(doc.content)}...
-              </p>
-              <p className={styles.documentMeta}>
-                作成: {formatDate(doc.createdAt)}
-              </p>
-              <p className={styles.documentMeta}>
-                更新: {formatDate(doc.updatedAt)}
-              </p>
-            </div>
-          ))}
+                <button
+                  type="button"
+                  className={styles.cardDeleteButton}
+                  onClick={(e) => handleDelete(e, doc.id)}
+                >
+                  削除
+                </button>
+                <h3 className={styles.documentTitle}>{doc.title}</h3>
+                <p className={styles.summaryText}>
+                  {preview ? `${preview}...` : '(空の文書)'}
+                </p>
+                <p className={styles.documentMeta}>
+                  文字数: {charCount.toLocaleString()}
+                </p>
+                <p className={styles.documentMeta}>
+                  作成: {formatDate(doc.createdAt)}
+                </p>
+                <p className={styles.documentMeta}>
+                  更新: {formatDate(doc.updatedAt)}
+                </p>
+              </div>
+            )
+          })}
+        </div>
+      ) : (
+        <div className={styles.tableContainer}>
+          <table className={styles.documentTable}>
+            <thead>
+              <tr>
+                <th
+                  className={styles.sortableHeader}
+                  onClick={() => handleSort('title')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      handleSort('title')
+                    }
+                  }}
+                >
+                  タイトル {getSortIcon('title')}
+                </th>
+                <th className={styles.tableHeader}>内容プレビュー</th>
+                <th
+                  className={styles.sortableHeader}
+                  onClick={() => handleSort('characterCount')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      handleSort('characterCount')
+                    }
+                  }}
+                >
+                  文字数 {getSortIcon('characterCount')}
+                </th>
+                <th
+                  className={styles.sortableHeader}
+                  onClick={() => handleSort('createdAt')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      handleSort('createdAt')
+                    }
+                  }}
+                >
+                  作成日時 {getSortIcon('createdAt')}
+                </th>
+                <th
+                  className={styles.sortableHeader}
+                  onClick={() => handleSort('updatedAt')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      handleSort('updatedAt')
+                    }
+                  }}
+                >
+                  更新日時 {getSortIcon('updatedAt')}
+                </th>
+                <th className={styles.tableHeader}>アクション</th>
+              </tr>
+            </thead>
+            <tbody>
+              {documents.map((doc) => {
+                const charCount = getCharacterCount(doc.content)
+                const preview = extractTextFromLexicalJSONStrSummary(
+                  doc.content
+                )
+                return (
+                  <tr
+                    key={doc.id}
+                    className={styles.documentRow}
+                    onClick={() => onSelectDocument(doc.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        onSelectDocument(doc.id)
+                      }
+                    }}
+                  >
+                    <td className={styles.titleCell}>{doc.title}</td>
+                    <td className={styles.previewCell}>
+                      {preview ? `${preview}...` : '(空の文書)'}
+                    </td>
+                    <td className={styles.countCell}>
+                      {charCount.toLocaleString()}
+                    </td>
+                    <td className={styles.dateCell}>
+                      {formatDate(doc.createdAt)}
+                    </td>
+                    <td className={styles.dateCell}>
+                      {formatDate(doc.updatedAt)}
+                    </td>
+                    <td className={styles.actionCell}>
+                      <button
+                        type="button"
+                        className={styles.editButton}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onSelectDocument(doc.id)
+                        }}
+                      >
+                        編集
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.deleteButton}
+                        onClick={(e) => handleDelete(e, doc.id)}
+                      >
+                        削除
+                      </button>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

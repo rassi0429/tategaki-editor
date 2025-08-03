@@ -17,21 +17,8 @@ body {
   flex-direction: column;
 }
 
-.app-header {
-  background-color: #2c3e50;
-  color: white;
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.app-header h1 {
-  font-size: 1.5rem;
-  font-weight: 500;
-}
-
 .app-main {
   flex: 1;
-  padding: 2rem;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -40,8 +27,7 @@ body {
 /* Tategaki Editor styles */
 .tategaki-editor-container {
   width: 100%;
-  max-width: 800px;
-  height: 600px;
+  height: 100vh;
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -51,33 +37,32 @@ body {
 }
 
 .tategaki-editor {
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 400px;
   position: relative;
-  flex: 1;
+  /*flex: 1;*/
 }
 
 .tategaki-editor-input {
   width: 100%;
   height: 100%;
-  padding: 2rem;
   outline: none;
   border: none;
   font-size: 18px;
   line-height: 2;
   resize: none;
-  
+
   /* Vertical writing mode */
   writing-mode: vertical-rl;
   text-orientation: upright;
-  direction: rtl;
-  
+  /*direction: rtl;*/
+
   /* Japanese text styling */
   font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic Medium', 'Meiryo', sans-serif;
   font-feature-settings: "vert" 1;
-  
+
   /* Text flow */
-  overflow-x: auto;
+  overflow-x: scroll;
   overflow-y: hidden;
   white-space: nowrap;
 }

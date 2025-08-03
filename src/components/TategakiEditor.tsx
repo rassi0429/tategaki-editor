@@ -1,5 +1,5 @@
-import { 
-  $getRoot, 
+import {
+  $getRoot,
 } from 'lexical'
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
@@ -9,6 +9,7 @@ import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { HeadingNode, QuoteNode } from '@lexical/rich-text'
 import ToolbarPlugin from './ToolbarPlugin'
+import NewLineVisibilityPlugin from "@/components/NewLineVisibilityPlugin.tsx";
 
 interface TategakiEditorProps {
   initialContent: string
@@ -16,7 +17,7 @@ interface TategakiEditorProps {
 }
 
 function MyOnChangePlugin({ onChange }: { onChange: (content: string) => void }) {
-  
+
   return (
     <OnChangePlugin
       onChange={(editorState) => {
@@ -60,6 +61,7 @@ function TategakiEditor({ onChange }: TategakiEditorProps) {
     <div className="tategaki-editor-container">
       <LexicalComposer initialConfig={initialConfig}>
         <ToolbarPlugin />
+        <NewLineVisibilityPlugin />
         <div className="tategaki-editor">
           <RichTextPlugin
             contentEditable={

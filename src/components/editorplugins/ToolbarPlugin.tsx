@@ -1,16 +1,13 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { $createHeadingNode, type HeadingTagType } from '@lexical/rich-text'
+import { $setBlocksType } from '@lexical/selection'
 import {
+  $createParagraphNode,
   $getSelection,
   $isRangeSelection,
   FORMAT_TEXT_COMMAND,
   SELECTION_CHANGE_COMMAND,
-  $createParagraphNode,
 } from 'lexical'
-import { $setBlocksType } from '@lexical/selection'
-import {
-  $createHeadingNode,
-  HeadingTagType,
-} from '@lexical/rich-text'
 import { useCallback, useEffect, useState } from 'react'
 
 interface ToolbarState {
@@ -51,11 +48,13 @@ export default function ToolbarPlugin() {
         updateToolbar()
         return false
       },
-      1,
+      1
     )
   }, [editor, updateToolbar])
 
-  const formatText = (format: 'bold' | 'italic' | 'strikethrough' | 'underline') => {
+  const formatText = (
+    format: 'bold' | 'italic' | 'strikethrough' | 'underline'
+  ) => {
     editor.dispatchCommand(FORMAT_TEXT_COMMAND, format)
   }
 

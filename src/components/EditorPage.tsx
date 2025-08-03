@@ -1,36 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import TategakiEditor from './TategakiEditor';
-import { getDocument, updateDocument } from '../utils/documentManager';
-import * as styles from './EditorPage.css';
+import type React from 'react'
+import { useEffect, useState } from 'react'
+import { getDocument, updateDocument } from '../utils/documentManager'
+import * as styles from './EditorPage.css'
+import TategakiEditor from './TategakiEditor'
 
 interface EditorPageProps {
-  documentId: string;
-  onBack: () => void;
+  documentId: string
+  onBack: () => void
 }
 
-export const EditorPage: React.FC<EditorPageProps> = ({ documentId, onBack }) => {
-  const [document, setDocument] = useState<any>(null);
-  const [title, setTitle] = useState('');
+export const EditorPage: React.FC<EditorPageProps> = ({
+  documentId,
+  onBack,
+}) => {
+  const [document, setDocument] = useState<any>(null)
+  const [title, setTitle] = useState('')
 
   useEffect(() => {
-    const doc = getDocument(documentId);
+    const doc = getDocument(documentId)
     if (doc) {
-      setDocument(doc);
-      setTitle(doc.title);
+      setDocument(doc)
+      setTitle(doc.title)
     }
-  }, [documentId]);
+  }, [documentId])
 
   const handleSave = (content: string) => {
-    updateDocument(documentId, { content, title });
-  };
+    updateDocument(documentId, { content, title })
+  }
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value);
-    updateDocument(documentId, { title: e.target.value });
-  };
+    setTitle(e.target.value)
+    updateDocument(documentId, { title: e.target.value })
+  }
 
   if (!document) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>
   }
 
   return (
@@ -47,10 +51,7 @@ export const EditorPage: React.FC<EditorPageProps> = ({ documentId, onBack }) =>
           placeholder="文書のタイトル"
         />
       </div>
-      <TategakiEditor 
-        initialContent={document.content}
-        onSave={handleSave}
-      />
+      <TategakiEditor initialContent={document.content} onSave={handleSave} />
     </div>
-  );
-};
+  )
+}

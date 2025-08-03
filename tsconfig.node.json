@@ -9,6 +9,8 @@
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowSyntheticDefaultImports": true,
+    "allowJs": true,
+    "outDir": "dist-node",
     "strict": true,
     "types": ["node"]
   },

@@ -116,16 +116,18 @@ export const toolbarButton = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  ':hover': {
-    backgroundColor: '#f8f9fa',
-    borderColor: '#ced4da',
-  },
-  ':active': {
-    backgroundColor: '#e9ecef',
-    borderColor: '#adb5bd',
-  },
-  ':focus': {
-    outline: '2px solid #007bff',
-    outlineOffset: '2px',
+  selectors: {
+    '&:hover': {
+      backgroundColor: '#f8f9fa',
+      borderColor: '#ced4da',
+    },
+    "&[aria-pressed='true']": {
+      backgroundColor: '#e9ecef',
+      borderColor: '#adb5bd',
+    },
+    '&:focus': {
+      outline: '2px solid #007bff',
+      outlineOffset: '2px',
+    },
   },
 })

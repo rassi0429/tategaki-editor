@@ -45,7 +45,7 @@ export const EditorPage: React.FC<EditorPageProps> = ({
     <div className={styles.container}>
       <div className={styles.header}>
         <button type="button" className={styles.backButton} onClick={onBack}>
-          ← 文書一覧へ
+          一覧
         </button>
         <input
           type="text"

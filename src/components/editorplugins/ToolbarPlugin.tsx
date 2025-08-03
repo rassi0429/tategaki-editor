@@ -10,6 +10,8 @@ import {
 } from 'lexical'
 import { useCallback, useEffect, useState } from 'react'
 
+import * as styles from './ToolbarPlugin.css'
+
 interface ToolbarState {
   isBold: boolean
   isItalic: boolean
@@ -77,11 +79,12 @@ export default function ToolbarPlugin() {
   }
 
   return (
-    <div className="toolbar">
-      <div className="toolbar-section">
+    <div className={styles.toolbar}>
+      <div className={styles.toolbarSection}>
         <button
           type="button"
-          className={`toolbar-button ${toolbarState.isBold ? 'active' : ''}`}
+          className={styles.toolbarButton}
+          aria-pressed={toolbarState.isBold}
           onClick={() => formatText('bold')}
           aria-label="太字"
         >
@@ -89,7 +92,8 @@ export default function ToolbarPlugin() {
         </button>
         <button
           type="button"
-          className={`toolbar-button ${toolbarState.isItalic ? 'active' : ''}`}
+          className={styles.toolbarButton}
+          aria-pressed={toolbarState.isItalic}
           onClick={() => formatText('italic')}
           aria-label="斜体"
         >
@@ -97,7 +101,8 @@ export default function ToolbarPlugin() {
         </button>
         <button
           type="button"
-          className={`toolbar-button ${toolbarState.isStrikethrough ? 'active' : ''}`}
+          className={styles.toolbarButton}
+          aria-pressed={toolbarState.isStrikethrough}
           onClick={() => formatText('strikethrough')}
           aria-label="取り消し線"
         >
@@ -105,7 +110,8 @@ export default function ToolbarPlugin() {
         </button>
         <button
           type="button"
-          className={`toolbar-button ${toolbarState.isUnderline ? 'active' : ''}`}
+          className={styles.toolbarButton}
+          aria-pressed={toolbarState.isUnderline}
           onClick={() => formatText('underline')}
           aria-label="下線"
         >
@@ -113,11 +119,11 @@ export default function ToolbarPlugin() {
         </button>
       </div>
 
-      <div className="toolbar-section">
-        <span className="toolbar-label">見出し:</span>
+      <div className={styles.toolbarSection}>
+        <span className={styles.toolbarLabel}>見出し:</span>
         <button
           type="button"
-          className="toolbar-button"
+          className={styles.toolbarButton}
           onClick={() => formatParagraph()}
           aria-label="本文"
         >
@@ -125,7 +131,7 @@ export default function ToolbarPlugin() {
         </button>
         <button
           type="button"
-          className="toolbar-button"
+          className={styles.toolbarButton}
           onClick={() => formatHeading('h1')}
           aria-label="見出し1"
         >
@@ -133,7 +139,7 @@ export default function ToolbarPlugin() {
         </button>
         <button
           type="button"
-          className="toolbar-button"
+          className={styles.toolbarButton}
           onClick={() => formatHeading('h2')}
           aria-label="見出し2"
         >
@@ -141,7 +147,7 @@ export default function ToolbarPlugin() {
         </button>
         <button
           type="button"
-          className="toolbar-button"
+          className={styles.toolbarButton}
           onClick={() => formatHeading('h3')}
           aria-label="見出し3"
         >
@@ -149,7 +155,7 @@ export default function ToolbarPlugin() {
         </button>
         <button
           type="button"
-          className="toolbar-button"
+          className={styles.toolbarButton}
           onClick={() => formatHeading('h4')}
           aria-label="見出し4"
         >

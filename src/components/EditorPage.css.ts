@@ -4,7 +4,7 @@ export const container = style({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-  height: '100vh',
+  height: '100dvh',
 })
 
 export const header = style({
@@ -17,6 +17,7 @@ export const header = style({
 })
 
 export const backButton = style({
+  flexShrink: 0,
   padding: '0.5rem 1rem',
   backgroundColor: '#f3f4f6',
   border: 'none',

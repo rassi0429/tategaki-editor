@@ -9,7 +9,6 @@ import { DocumentList } from './components/DocumentList'
 import { EditorPage } from './components/EditorPage'
 
 import * as styles from './styles/index.css'
-import './styles/orig.css'
 
 function DocumentListPage() {
   const navigate = useNavigate()
@@ -41,7 +40,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className={styles.app}>
-        <main className={styles.appMain}>
+        <main>
           <Routes>
             <Route path="/" element={<DocumentListPage />} />
             <Route path="/edit/:id" element={<EditorPageWrapper />} />

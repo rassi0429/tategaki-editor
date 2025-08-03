@@ -12,7 +12,7 @@ export const header = style({
   justifyContent: 'space-between',
   alignItems: 'center',
   padding: "0.5rem",
-  borderBottom: '2px solid #e5e7eb',
+  // borderBottom: '2px solid #e5e7eb',
 })
 
 export const title = style({

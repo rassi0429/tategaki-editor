@@ -22,30 +22,13 @@ interface TategakiEditorProps {
 }
 
 
-
-const theme = {
-  text: {
-    bold: 'editor-text-bold',
-    italic: 'editor-text-italic',
-    strikethrough: 'editor-text-strikethrough',
-    underline: 'editor-text-underline',
-  },
-  paragraph: 'editor-paragraph',
-  heading: {
-    h1: 'editor-heading-h1',
-    h2: 'editor-heading-h2',
-    h3: 'editor-heading-h3',
-    h4: 'editor-heading-h4',
-  },
-}
-
 function TategakiEditor({ onChange, onSave, initialEditorState, initialContent }: TategakiEditorProps) {
 
   const editorStateRef = useRef(undefined);
 
   const initialConfig = {
     namespace: 'TategakiEditor',
-    theme,
+    theme: styles.theme,
     nodes: [HeadingNode, QuoteNode],
     onError(error: Error) {
       console.error('Lexical error:', error)

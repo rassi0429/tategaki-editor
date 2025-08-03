@@ -3,7 +3,6 @@ import { DocumentList } from './components/DocumentList'
 import { EditorPage } from './components/EditorPage'
 
 import * as styles from './styles/index.css'
-import "./styles/orig.css"
 
 function DocumentListPage() {
   const navigate = useNavigate()

@@ -1,4 +1,5 @@
-import { style, styleVariants } from "@vanilla-extract/css"
+import { style } from "@vanilla-extract/css"
+import { EditorThemeClasses } from "lexical"
 
 /* Tategaki Editor styles */
 export const container = style({
@@ -54,3 +55,20 @@ export const placeholder = style({
     textOrientation: "upright",
 })
 
+export const theme: EditorThemeClasses = {
+    text: {
+        bold: style({ fontWeight: "bold", }),
+        italic: style({ fontStyle: "italic", }),
+        strikethrough: style({ textDecoration: "line-through", }),
+        underline: style({ textDecoration: "underline", }),
+    },
+    paragraph: style({ margin: 0 }),
+    heading: {
+        h1: style({ fontSize: "2em", fontWeight: "bold" }),
+        h2: style({ fontSize: "1.5em", fontWeight: "bold" }),
+        h3: style({ fontSize: "1.17em", fontWeight: "bold" }),
+        h4: style({ fontSize: "1em", fontWeight: "bold" }),
+        h5: style({ fontSize: "1em", fontWeight: "bold" }),
+        h6: style({ fontSize: "1em", fontWeight: "bold" }),
+    },
+}

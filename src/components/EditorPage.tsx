@@ -1,6 +1,10 @@
 import type React from 'react'
 import { useEffect, useState } from 'react'
-import { getDocument, updateDocument } from '../utils/documentManager'
+import {
+  type Document,
+  getDocument,
+  updateDocument,
+} from '../utils/documentManager'
 import * as styles from './EditorPage.css'
 import TategakiEditor from './TategakiEditor'
 
@@ -13,7 +17,7 @@ export const EditorPage: React.FC<EditorPageProps> = ({
   documentId,
   onBack,
 }) => {
-  const [document, setDocument] = useState<any>(null)
+  const [document, setDocument] = useState<Document | null>(null)
   const [title, setTitle] = useState('')
 
   useEffect(() => {
@@ -40,7 +44,7 @@ export const EditorPage: React.FC<EditorPageProps> = ({
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <button className={styles.backButton} onClick={onBack}>
+        <button type="button" className={styles.backButton} onClick={onBack}>
           ← 文書一覧へ
         </button>
         <input

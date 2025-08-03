@@ -29,7 +29,12 @@ function EditorPageWrapper() {
     navigate('/')
   }
 
-  return <EditorPage documentId={id!} onBack={handleBack} />
+  if (!id) {
+    navigate('/')
+    return null
+  }
+
+  return <EditorPage documentId={id} onBack={handleBack} />
 }
 
 function App() {

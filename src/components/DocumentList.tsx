@@ -22,10 +22,22 @@ const formatDate = (date: Date) => {
   })
 }
 
-const extractTextFromLexicalJSON = (editorStateJSON: any): string => {
+interface LexicalNode {
+  type: string
+  text?: string
+  children?: LexicalNode[]
+}
+
+interface LexicalEditorState {
+  root: LexicalNode
+}
+
+const extractTextFromLexicalJSON = (
+  editorStateJSON: LexicalEditorState
+): string => {
   const root = editorStateJSON.root
 
-  function extractTextFromNode(node: any) {
+  function extractTextFromNode(node: LexicalNode) {
     let text = ''
 
     // テキストノードの場合
@@ -90,7 +102,11 @@ export const DocumentList: React.FC<DocumentListProps> = ({
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.title}>縦書きエディタ</div>
-        <button className={styles.newButton} onClick={handleCreateNew}>
+        <button
+          type="button"
+          className={styles.newButton}
+          onClick={handleCreateNew}
+        >
           新規作成
         </button>
       </div>
@@ -101,7 +117,11 @@ export const DocumentList: React.FC<DocumentListProps> = ({
           <p className={styles.emptyStateText}>
             「新規作成」ボタンをクリックして、最初の文書を作成しましょう。
           </p>
-          <button className={styles.newButton} onClick={handleCreateNew}>
+          <button
+            type="button"
+            className={styles.newButton}
+            onClick={handleCreateNew}
+          >
             最初の文書を作成
           </button>
         </div>
@@ -112,8 +132,14 @@ export const DocumentList: React.FC<DocumentListProps> = ({
               key={doc.id}
               className={styles.documentCard}
               onClick={() => onSelectDocument(doc.id)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  onSelectDocument(doc.id)
+                }
+              }}
             >
               <button
+                type="button"
                 className={styles.deleteButton}
                 onClick={(e) => handleDelete(e, doc.id)}
               >

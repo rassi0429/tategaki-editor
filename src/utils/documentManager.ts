@@ -21,7 +21,7 @@ export const getDocuments = (): Document[] => {
   if (!stored) return []
 
   const docs = JSON.parse(stored)
-  return docs.map((doc: any) => ({
+  return docs.map((doc: Document) => ({
     ...doc,
     createdAt: new Date(doc.createdAt),
     updatedAt: new Date(doc.updatedAt),

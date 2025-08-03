@@ -1,32 +1,36 @@
 import { style } from "@vanilla-extract/css"
 import { EditorThemeClasses } from "lexical"
 
+const charInLine = 40;
+const editorPading = "2rem";
+
 /* Tategaki Editor styles */
 export const container = style({
-    width: "100%",
-    height: "100vh",
+    flex:1,
     backgroundColor: "white",
     borderRadius: "8px",
     boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
     overflow: "hidden",
     display: "flex",
-    flexDirection: "column"
+    flexDirection: "column",
 })
 
 export const editor = style({
     width: "100%",
     height: "100%",
     position: "relative",
+    containerType: "size",
 })
 
 export const input = style({
+    padding: editorPading,
+    // FIXME: 文字数合わせに入ってる1emは何由来？
+    fontSize: `max(1rem, calc((100cqh - ${editorPading} * 2 - 1em) / ${charInLine}))`,
+
     width: "100%",
-    height: "400px",
+    height: "100%",
     outline: "none",
-    border: "none",
-    fontSize: "calc(400px / 40)",
     lineHeight: "2",
-    resize: "none",
 
     /* Vertical writing mode */
     writingMode: "vertical-rl",
@@ -39,17 +43,14 @@ export const input = style({
     /* Text flow */
     overflowX: "scroll",
     overflowY: "hidden",
-    whiteSpace: "nowrap"
 })
 
 
 export const placeholder = style({
     position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
+    top: editorPading,
+    right: editorPading,
     color: "#999",
-    fontSize: "calc(400px / 40)",
     pointerEvents: "none",
     writingMode: "vertical-rl",
     textOrientation: "upright",

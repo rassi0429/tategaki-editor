@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { $getRoot, $getSelection } from 'lexical';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 
+import * as styles from './CurrentInfo.css';
+
 function CurrentInfo() {
   const [editor] = useLexicalComposerContext();
   const [characterCount, setCharacterCount] = useState(0);
@@ -30,7 +32,7 @@ function CurrentInfo() {
     };
   }, [editor]);
 
-  return <div style={{ position: "fixed", bottom: 0, left: 0 }}>文字数: {characterCount} 行数: {lineCount}</div>;
+  return <div className={styles.container}>文字数: {characterCount} 行数: {lineCount}</div>;
 }
 
 export default CurrentInfo

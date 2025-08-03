@@ -1,4 +1,4 @@
-import { globalStyle, style, styleVariants } from "@vanilla-extract/css"
+import { globalStyle, style } from "@vanilla-extract/css"
 
 /* Base styles */
 
@@ -22,8 +22,8 @@ export const app = style({
 })
 
 export const appMain = style({
-    flex: 1,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "flex-start",
+    // flex: 1,
+    // display: "flex",
+    // justifyContent: "center",
+    // alignItems: "flex-start",
 })

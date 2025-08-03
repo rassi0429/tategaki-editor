@@ -1,22 +1,43 @@
-import { useState } from 'react'
-import TategakiEditor from './components/TategakiEditor'
-import { usePersistent } from './hooks/usePersistent'
+import { BrowserRouter, Routes, Route, useNavigate, useParams } from 'react-router-dom'
+import { DocumentList } from './components/DocumentList'
+import { EditorPage } from './components/EditorPage'
 
 import * as styles from './styles/index.css'
 import "./styles/orig.css"
 
-function App() {
-  const [content, setContent] = usePersistent('tategaki-content', "")
+function DocumentListPage() {
+  const navigate = useNavigate()
+  
+  const handleSelectDocument = (id: string) => {
+    navigate(`/edit/${id}`)
+  }
+  
+  return <DocumentList onSelectDocument={handleSelectDocument} />
+}
 
+function EditorPageWrapper() {
+  const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
+  
+  const handleBack = () => {
+    navigate('/')
+  }
+  
+  return <EditorPage documentId={id!} onBack={handleBack} />
+}
+
+function App() {
   return (
-    <div className={styles.app}>
-      <main className={styles.appMain}>
-        <TategakiEditor
-          initialEditorState={content}
-          onChange={setContent}
-        />
-      </main>
-    </div>
+    <BrowserRouter>
+      <div className={styles.app}>
+        <main className={styles.appMain}>
+          <Routes>
+            <Route path="/" element={<DocumentListPage />} />
+            <Route path="/edit/:id" element={<EditorPageWrapper />} />
+          </Routes>
+        </main>
+      </div>
+    </BrowserRouter>
   )
 }
 

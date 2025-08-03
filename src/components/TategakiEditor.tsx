@@ -15,8 +15,10 @@ import { EditorState } from 'lexical'
 import CurrentInfo from './editorplugins/CurrentInfo'
 
 interface TategakiEditorProps {
-  initialEditorState: string
-  onChange: (content: string) => void
+  initialContent?: string
+  onSave?: (content: string) => void
+  initialEditorState?: string
+  onChange?: (content: string) => void
 }
 
 
@@ -37,7 +39,7 @@ const theme = {
   },
 }
 
-function TategakiEditor({ onChange, initialEditorState }: TategakiEditorProps) {
+function TategakiEditor({ onChange, onSave, initialEditorState, initialContent }: TategakiEditorProps) {
 
   const editorStateRef = useRef(undefined);
 
@@ -69,7 +71,7 @@ function TategakiEditor({ onChange, initialEditorState }: TategakiEditorProps) {
           />
           <HistoryPlugin />
           <CurrentInfo />
-          <CustomOnChangePlugin onChange={onChange} initString={initialEditorState} />
+          <CustomOnChangePlugin onChange={onChange || onSave} initString={initialEditorState || initialContent} />
         </div>
       </LexicalComposer>
     </div>

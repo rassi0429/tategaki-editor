@@ -48,7 +48,7 @@ body {
   height: 100%;
   outline: none;
   border: none;
-  font-size: 18px;
+  font-size: calc(400px / 40);
   line-height: 2;
   resize: none;
 
@@ -58,7 +58,7 @@ body {
   /*direction: rtl;*/
 
   /* Japanese text styling */
-  font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic Medium', 'Meiryo', sans-serif;
+  font-family: "Noto Serif JP" , sans-serif;
   font-feature-settings: "vert" 1;
 
   /* Text flow */
@@ -97,6 +97,7 @@ body {
 
 .editor-paragraph {
   margin: 0;
+  font-size: 1em;
 }
 
 .editor-heading-h1 {

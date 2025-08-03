@@ -19,8 +19,12 @@ interface TategakiEditorProps {
   onChange?: (content: string) => void
 }
 
-
-function TategakiEditor({ onChange, onSave, initialEditorState, initialContent }: TategakiEditorProps) {
+function TategakiEditor({
+  onChange,
+  onSave,
+  initialEditorState,
+  initialContent,
+}: TategakiEditorProps) {
   const initialConfig = {
     namespace: 'TategakiEditor',
     theme: styles.theme,

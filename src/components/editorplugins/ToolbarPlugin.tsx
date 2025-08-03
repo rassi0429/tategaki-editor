@@ -10,6 +10,7 @@ import {
 } from 'lexical'
 import { useCallback, useEffect, useState } from 'react'
 
+import { insertRuby } from './RubyNode'
 import * as styles from './ToolbarPlugin.css'
 
 interface ToolbarState {
@@ -74,6 +75,15 @@ export default function ToolbarPlugin() {
       const selection = $getSelection()
       if ($isRangeSelection(selection)) {
         $setBlocksType(selection, () => $createParagraphNode())
+      }
+    })
+  }
+
+  const formatRuby = () => {
+    editor.update(() => {
+      const selection = $getSelection()
+      if ($isRangeSelection(selection)) {
+        insertRuby(editor, 'ルビのテキスト', 'よみ')
       }
     })
   }
@@ -160,6 +170,14 @@ export default function ToolbarPlugin() {
           aria-label="見出し4"
         >
           H4
+        </button>
+        <button
+          type="button"
+          className={styles.toolbarButton}
+          onClick={() => formatRuby()}
+          aria-label="ルビ"
+        >
+          ルビ
         </button>
       </div>
     </div>

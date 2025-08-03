@@ -11,6 +11,7 @@ import ToolbarPlugin from '@/components/editorplugins/ToolbarPlugin'
 
 import * as styles from './TategakiEditor.css'
 import CurrentInfo from './editorplugins/CurrentInfo'
+import { RubyNode, RubyPlugin } from './editorplugins/RubyNode'
 
 interface TategakiEditorProps {
   initialContent?: string
@@ -28,7 +29,7 @@ function TategakiEditor({
   const initialConfig = {
     namespace: 'TategakiEditor',
     theme: styles.theme,
-    nodes: [HeadingNode, QuoteNode],
+    nodes: [HeadingNode, QuoteNode, RubyNode],
     onError(error: Error) {
       console.error('Lexical error:', error)
     },
@@ -38,13 +39,19 @@ function TategakiEditor({
     <div className={styles.container}>
       <LexicalComposer initialConfig={initialConfig}>
         <ToolbarPlugin />
+        <RubyPlugin />
         <NewLineVisibilityPlugin />
         <div className={styles.editor}>
           <RichTextPlugin
             contentEditable={<ContentEditable className={styles.input} />}
             placeholder={
               <div className={styles.placeholder}>
-                縦書きテキストを入力してください...
+                <ruby>
+                  縦書き<rp>(</rp>
+                  <rt>たてがき</rt>
+                  <rp>)</rp>
+                </ruby>
+                テキストを入力してください...
               </div>
             }
             ErrorBoundary={LexicalErrorBoundary}

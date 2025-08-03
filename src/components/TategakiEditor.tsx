@@ -1,35 +1,25 @@
-import {
-  $getRoot,
-} from 'lexical'
+import { useRef } from 'react'
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
-import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { HeadingNode, QuoteNode } from '@lexical/rich-text'
-import ToolbarPlugin from './ToolbarPlugin'
-import NewLineVisibilityPlugin from "@/components/NewLineVisibilityPlugin.tsx";
+
+import ToolbarPlugin from '@/components/editorplugins/ToolbarPlugin'
+import NewLineVisibilityPlugin from "@/components/editorplugins/NewLineVisibilityPlugin";
+import CustomOnChangePlugin from "@/components/editorplugins/CustomOnChangePlugin"
+
+import * as styles from './TategakiEditor.css'
+import { EditorState } from 'lexical'
+import CurrentInfo from './editorplugins/CurrentInfo'
 
 interface TategakiEditorProps {
-  initialContent: string
+  initialEditorState: string
   onChange: (content: string) => void
 }
 
-function MyOnChangePlugin({ onChange }: { onChange: (content: string) => void }) {
 
-  return (
-    <OnChangePlugin
-      onChange={(editorState) => {
-        editorState.read(() => {
-          const root = $getRoot()
-          const text = root.getTextContent()
-          onChange(text)
-        })
-      }}
-    />
-  )
-}
 
 const theme = {
   text: {
@@ -47,7 +37,10 @@ const theme = {
   },
 }
 
-function TategakiEditor({ onChange }: TategakiEditorProps) {
+function TategakiEditor({ onChange, initialEditorState }: TategakiEditorProps) {
+
+  const editorStateRef = useRef(undefined);
+
   const initialConfig = {
     namespace: 'TategakiEditor',
     theme,
@@ -58,24 +51,25 @@ function TategakiEditor({ onChange }: TategakiEditorProps) {
   }
 
   return (
-    <div className="tategaki-editor-container">
+    <div className={styles.container}>
       <LexicalComposer initialConfig={initialConfig}>
         <ToolbarPlugin />
         <NewLineVisibilityPlugin />
-        <div className="tategaki-editor">
+        <div className={styles.editor}>
           <RichTextPlugin
             contentEditable={
-              <ContentEditable className="tategaki-editor-input" />
+              <ContentEditable className={styles.input} />
             }
             placeholder={
-              <div className="tategaki-editor-placeholder">
+              <div className={styles.placeholder}>
                 縦書きテキストを入力してください...
               </div>
             }
             ErrorBoundary={LexicalErrorBoundary}
           />
           <HistoryPlugin />
-          <MyOnChangePlugin onChange={onChange} />
+          <CurrentInfo />
+          <CustomOnChangePlugin onChange={onChange} initString={initialEditorState} />
         </div>
       </LexicalComposer>
     </div>

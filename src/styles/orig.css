@@ -128,9 +128,8 @@ body {
 .toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
-  padding: 1rem;
-  background-color: #f8f9fa;
+  gap: 0.5rem;
+  padding: 0.5rem;
   border-bottom: 1px solid #e9ecef;
   align-items: center;
 }

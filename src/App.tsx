@@ -1,14 +1,18 @@
 import { useState } from 'react'
 import TategakiEditor from './components/TategakiEditor'
+import { usePersistent } from './hooks/usePersistent'
+
+import * as styles from './styles/index.css'
+import "./styles/orig.css"
 
 function App() {
-  const [content, setContent] = useState('')
+  const [content, setContent] = usePersistent('tategaki-content', "")
 
   return (
-    <div className="app">
-      <main className="app-main">
+    <div className={styles.app}>
+      <main className={styles.appMain}>
         <TategakiEditor
-          initialContent={content}
+          initialEditorState={content}
           onChange={setContent}
         />
       </main>

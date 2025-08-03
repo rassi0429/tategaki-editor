@@ -80,7 +80,6 @@ export default function ToolbarPlugin() {
   return (
     <div className="toolbar">
       <div className="toolbar-section">
-        <span className="toolbar-label">書式:</span>
         <button
           type="button"
           className={`toolbar-button ${toolbarState.isBold ? 'active' : ''}`}
@@ -114,7 +113,7 @@ export default function ToolbarPlugin() {
           <u>線</u>
         </button>
       </div>
-      
+
       <div className="toolbar-section">
         <span className="toolbar-label">見出し:</span>
         <button

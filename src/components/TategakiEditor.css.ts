@@ -1,5 +1,5 @@
 import { style } from "@vanilla-extract/css"
-import { EditorThemeClasses } from "lexical"
+import type { EditorThemeClasses } from "lexical"
 
 const charInLine = 40;
 const editorPading = "2rem";

@@ -1,11 +1,11 @@
-import { style } from '@vanilla-extract/css';
+import { style } from '@vanilla-extract/css'
 
 export const container = style({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
   height: '100dvh',
-});
+})
 
 export const header = style({
   display: 'flex',
@@ -14,7 +14,7 @@ export const header = style({
   padding: '1rem',
   borderBottom: '1px solid #e5e7eb',
   backgroundColor: 'white',
-});
+})
 
 export const backButton = style({
   flexShrink: 0,
@@ -29,7 +29,7 @@ export const backButton = style({
   ':hover': {
     backgroundColor: '#e5e7eb',
   },
-});
+})
 
 export const titleInput = style({
   flex: 1,
@@ -43,4 +43,4 @@ export const titleInput = style({
   ':focus': {
     borderColor: '#3b82f6',
   },
-});
+})

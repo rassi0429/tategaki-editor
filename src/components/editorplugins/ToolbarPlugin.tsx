@@ -1,6 +1,7 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $createHeadingNode, type HeadingTagType } from '@lexical/rich-text'
 import { $setBlocksType } from '@lexical/selection'
+import { $wrapNodes } from '@lexical/selection'
 import {
   $createParagraphNode,
   $getSelection,
@@ -10,7 +11,7 @@ import {
 } from 'lexical'
 import { useCallback, useEffect, useState } from 'react'
 
-import { insertRuby } from './RubyNode'
+import { $createRubyNode } from './RubyNode'
 import * as styles from './ToolbarPlugin.css'
 
 interface ToolbarState {
@@ -80,14 +81,15 @@ export default function ToolbarPlugin() {
   }
 
   const formatRuby = () => {
+    const rubyText = prompt('ルビのテキストを入力してください:', '')
+    if (rubyText === null || rubyText.trim() === '') {
+      return
+    }
+
     editor.update(() => {
       const selection = $getSelection()
       if ($isRangeSelection(selection)) {
-        const baseText = selection.getTextContent()
-        const rubyText = prompt('ルビのテキストを入力してください:', '')
-        if (rubyText !== null) {
-          insertRuby(editor, baseText, rubyText)
-        }
+        $wrapNodes(selection, () => $createRubyNode(rubyText))
       }
     })
   }

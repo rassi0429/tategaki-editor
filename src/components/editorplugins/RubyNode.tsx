@@ -1,192 +1,106 @@
-import {
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { type ReactNode, useEffect, useRef, useState } from 'react'
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection'
 import {
-  $applyNodeReplacement,
-  $getSelection,
-  $isRangeSelection,
-  DecoratorNode,
+  $getNodeByKey,
+  ElementNode,
   type EditorConfig,
   type LexicalEditor,
   type LexicalNode,
   type NodeKey,
-  type SerializedLexicalNode,
+  type SerializedElementNode,
   type Spread,
 } from 'lexical'
 
 // RubyNodeのシリアライズ形式
 export type SerializedRubyNode = Spread<
   {
-    baseText: string
     rubyText: string
     type: 'ruby'
     version: 1
   },
-  SerializedLexicalNode
+  SerializedElementNode
 >
 
 // ルビタグをレンダリングするためのReactコンポーネント
 function RubyComponent({
-  baseText: initialBaseText,
   rubyText: initialRubyText,
   nodeKey,
+  children,
 }: {
-  baseText: string
   rubyText: string
   nodeKey: NodeKey
+  children: ReactNode
 }) {
   const [editor] = useLexicalComposerContext()
-  const [isSelected, setSelected, clearSelection] =
-    useLexicalNodeSelection(nodeKey)
+  const [isSelected] = useLexicalNodeSelection(nodeKey)
   const [isEditing, setIsEditing] = useState(false)
-  const wrapperRef = useRef<HTMLSpanElement>(null)
-  const baseInputRef = useRef<HTMLInputElement>(null)
-  const rubyInputRef = useRef<HTMLInputElement>(null)
-
-  const [baseText, setBaseText] = useState(initialBaseText)
   const [rubyText, setRubyText] = useState(initialRubyText)
+  const inputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    if (!isEditing) {
-      setBaseText(initialBaseText)
-      setRubyText(initialRubyText)
-    }
-  }, [initialBaseText, initialRubyText, isEditing])
-
-  const handleSave = useCallback(() => {
-    if (!isEditing) return
-    setIsEditing(false)
-
-    if (baseText === initialBaseText && rubyText === initialRubyText) {
-      return
-    }
-
+  const handleSave = () => {
     editor.update(() => {
-      const node = editor.getEditorState()._nodeMap.get(nodeKey)
+      const node = $getNodeByKey(nodeKey)
       if ($isRubyNode(node)) {
-        node.setBaseText(baseText)
         node.setRubyText(rubyText)
       }
     })
-  }, [editor, isEditing, baseText, rubyText, initialBaseText, initialRubyText, nodeKey])
+    setIsEditing(false)
+  }
 
   useEffect(() => {
     if (isEditing) {
-      baseInputRef.current?.select()
+      inputRef.current?.focus()
     }
   }, [isEditing])
 
-  useEffect(() => {
-    if (!isEditing) return
-
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(event.target as Node)
-      ) {
-        handleSave()
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isEditing, handleSave])
-
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
-      event.preventDefault()
       handleSave()
     } else if (event.key === 'Escape') {
-      event.preventDefault()
       setIsEditing(false)
+      setRubyText(initialRubyText)
     }
-  }
-
-  if (isEditing) {
-    return (
-      <span
-        ref={wrapperRef}
-        style={{ display: 'inline-block', verticalAlign: 'text-top' }}
-        aria-label="ルビ編集フォーム"
-      >
-        <ruby
-          className={isSelected ? 'selected editing' : 'editing'}
-          data-lexical-decorator="true"
-        >
-          <input
-            ref={baseInputRef}
-            value={baseText}
-            onChange={(e) => setBaseText(e.target.value)}
-            onKeyDown={handleKeyDown}
-            size={baseText.length > 1 ? baseText.length : 1}
-            style={{
-              border: 'none',
-              outline: 'none',
-              background: 'transparent',
-              font: 'inherit',
-              color: 'inherit',
-              textAlign: 'center',
-            }}
-          />
-          <rt>
-            <input
-              ref={rubyInputRef}
-              value={rubyText}
-              onChange={(e) => setRubyText(e.target.value)}
-              onKeyDown={handleKeyDown}
-              size={rubyText.length > 1 ? rubyText.length : 1}
-              style={{
-                border: 'none',
-                outline: 'none',
-                background: 'transparent',
-                font: 'inherit',
-                color: 'inherit',
-                fontSize: '0.5em',
-                textAlign: 'center',
-              }}
-            />
-          </rt>
-        </ruby>
-      </span>
-    )
   }
 
   return (
-    <ruby
-      data-lexical-decorator="true"
-      data-lexical-node-key={nodeKey}
-      className={isSelected ? 'selected' : ''}
-      onClick={() => {
-        clearSelection()
-        setSelected(true)
-        setIsEditing(true)
-      }}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault()
-          clearSelection()
-          setSelected(true)
-          setIsEditing(true)
-        }
-      }}
-    >
-      {initialBaseText}
-      <rt>{initialRubyText}</rt>
+    <ruby className={isSelected ? 'selected' : ''}>
+      {children}
+      <rt>
+        {isEditing ? (
+          <input
+            ref={inputRef}
+            value={rubyText}
+            onChange={(e) => setRubyText(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleSave}
+            style={{ width: '5em' }}
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setIsEditing(true)}
+            onKeyDown={(e) => e.key === 'Enter' && setIsEditing(true)}
+            style={{
+              background: 'none',
+              border: 'none',
+              padding: 0,
+              font: 'inherit',
+              color: 'inherit',
+              cursor: 'pointer',
+            }}
+          >
+            {initialRubyText}
+          </button>
+        )}
+      </rt>
     </ruby>
   )
 }
 
 // RubyNode クラス
-export class RubyNode extends DecoratorNode<ReactNode> {
-  __baseText: string
+export class RubyNode extends ElementNode {
   __rubyText: string
 
   static getType(): string {
@@ -194,26 +108,25 @@ export class RubyNode extends DecoratorNode<ReactNode> {
   }
 
   static clone(node: RubyNode): RubyNode {
-    return new RubyNode(node.__baseText, node.__rubyText, node.__key)
+    return new RubyNode(node.__rubyText, node.__key)
   }
 
   static importJSON(serializedNode: SerializedRubyNode): RubyNode {
-    const node = $createRubyNode(
-      serializedNode.baseText,
-      serializedNode.rubyText
-    )
+    const node = $createRubyNode(serializedNode.rubyText)
+    node.setFormat(serializedNode.format)
+    node.setIndent(serializedNode.indent)
+    node.setDirection(serializedNode.direction)
     return node
   }
 
-  constructor(baseText: string, rubyText: string, key?: NodeKey) {
+  constructor(rubyText: string, key?: NodeKey) {
     super(key)
-    this.__baseText = baseText
     this.__rubyText = rubyText
   }
 
   exportJSON(): SerializedRubyNode {
     return {
-      baseText: this.__baseText,
+      ...super.exportJSON(),
       rubyText: this.__rubyText,
       type: 'ruby',
       version: 1,
@@ -221,21 +134,19 @@ export class RubyNode extends DecoratorNode<ReactNode> {
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
-    // DecoratorNodeの場合、これはプレースホルダーです
-    return document.createElement('span')
+    const element = document.createElement('ruby')
+    const rubyTextElement = document.createElement('rt')
+    rubyTextElement.innerText = this.__rubyText
+    element.appendChild(rubyTextElement)
+    return element
   }
 
-  getTextContent(): string {
-    return this.__baseText
-  }
-
-  isInline(): boolean {
-    return true
-  }
-
-  setBaseText(newBaseText: string) {
-    const writable = this.getWritable()
-    writable.__baseText = newBaseText
+  updateDOM(prevNode: RubyNode, dom: HTMLElement): boolean {
+    const rtElement = dom.querySelector('rt')
+    if (rtElement && prevNode.__rubyText !== this.__rubyText) {
+      rtElement.innerText = this.__rubyText
+    }
+    return false
   }
 
   setRubyText(newRubyText: string) {
@@ -243,20 +154,35 @@ export class RubyNode extends DecoratorNode<ReactNode> {
     writable.__rubyText = newRubyText
   }
 
-  decorate(): ReactNode {
+  getRubyText(): string {
+    return this.getLatest().__rubyText
+  }
+
+  isInline(): boolean {
+    return true
+  }
+
+  // ElementNodeはdecorateを直接使わないが、
+  // Reactコンポーネントでレンダリングを制御したい場合に備えておく
+  decorate(editor: LexicalEditor, config: EditorConfig): ReactNode {
     return (
-      <RubyComponent
-        baseText={this.__baseText}
-        rubyText={this.__rubyText}
-        nodeKey={this.getKey()}
-      />
+      <RubyComponent rubyText={this.getRubyText()} nodeKey={this.getKey()}>
+        {this.getChildren().map((child) => {
+          // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+          if (typeof (child as any).decorate === 'function') {
+            // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+            return (child as any).decorate(editor, config)
+          }
+          return null // または適切なデフォルトのレンダリング
+        })}
+      </RubyComponent>
     )
   }
 }
 
 // RubyNode作成ヘルパー関数
-export function $createRubyNode(baseText: string, rubyText: string): RubyNode {
-  return $applyNodeReplacement(new RubyNode(baseText, rubyText))
+export function $createRubyNode(rubyText: string): RubyNode {
+  return new RubyNode(rubyText)
 }
 
 // RubyNode判定関数
@@ -275,19 +201,4 @@ export const RubyPlugin = (): JSX.Element | null => {
     }
   }, [editor])
   return null
-}
-
-// 使用例：ルビ挿入コマンド
-export function insertRuby(
-  editor: LexicalEditor,
-  baseText: string,
-  rubyText: string
-): void {
-  editor.update(() => {
-    const selection = $getSelection()
-    if ($isRangeSelection(selection)) {
-      const rubyNode = $createRubyNode(baseText, rubyText)
-      selection.insertNodes([rubyNode])
-    }
-  })
 }

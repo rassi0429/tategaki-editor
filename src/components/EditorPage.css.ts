@@ -11,7 +11,7 @@ export const header = style({
   display: 'flex',
   alignItems: 'center',
   gap: '1rem',
-  padding: '1rem',
+  padding: '0.5rem',
   borderBottom: '1px solid #e5e7eb',
   backgroundColor: 'white',
 })
@@ -32,10 +32,10 @@ export const backButton = style({
 })
 
 export const titleInput = style({
-  flex: 1,
+  minWidth: '200px',
   padding: '0.5rem 1rem',
-  fontSize: '1.125rem',
-  fontWeight: '600',
+  fontSize: '1rem',
+  fontWeight: '500',
   border: '1px solid #e5e7eb',
   borderRadius: '0.375rem',
   outline: 'none',
@@ -43,4 +43,8 @@ export const titleInput = style({
   ':focus': {
     borderColor: '#3b82f6',
   },
+})
+
+export const toolbarContainer = style({
+  flexShrink: 0,
 })

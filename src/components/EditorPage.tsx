@@ -7,6 +7,12 @@ import {
 } from '../utils/documentManager'
 import * as styles from './EditorPage.css'
 import TategakiEditor from './TategakiEditor'
+import { LexicalComposer } from '@lexical/react/LexicalComposer'
+import { HeadingNode, QuoteNode } from '@lexical/rich-text'
+import { RubyNode } from './editorplugins/RubyNode'
+import { TateChuYokoNode } from './editorplugins/TateChuYokoNode'
+import ToolbarPlugin from './editorplugins/ToolbarPlugin'
+import * as editorStyles from './TategakiEditor.css'
 
 interface EditorPageProps {
   documentId: string
@@ -41,21 +47,35 @@ export const EditorPage: React.FC<EditorPageProps> = ({
     return <div>Loading...</div>
   }
 
+  const initialConfig = {
+    namespace: 'TategakiEditor',
+    theme: editorStyles.theme,
+    nodes: [HeadingNode, QuoteNode, RubyNode, TateChuYokoNode],
+    onError(error: Error) {
+      console.error('Lexical error:', error)
+    },
+  }
+
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
-        <button type="button" className={styles.backButton} onClick={onBack}>
-          一覧
-        </button>
-        <input
-          type="text"
-          className={styles.titleInput}
-          value={title}
-          onChange={handleTitleChange}
-          placeholder="文書のタイトル"
-        />
-      </div>
-      <TategakiEditor initialContent={document.content} onSave={handleSave} />
+      <LexicalComposer initialConfig={initialConfig}>
+        <div className={styles.header}>
+          <button type="button" className={styles.backButton} onClick={onBack}>
+            一覧
+          </button>
+          <input
+            type="text"
+            className={styles.titleInput}
+            value={title}
+            onChange={handleTitleChange}
+            placeholder="タイトル"
+          />
+          <div className={styles.toolbarContainer}>
+            <ToolbarPlugin />
+          </div>
+        </div>
+        <TategakiEditor initialContent={document.content} onSave={handleSave} />
+      </LexicalComposer>
     </div>
   )
 }

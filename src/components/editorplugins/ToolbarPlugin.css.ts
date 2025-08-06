@@ -86,7 +86,6 @@ export const toolbar = style({
   flexWrap: 'wrap',
   gap: '0.5rem',
   padding: '0.5rem',
-  borderBottom: '1px solid #e9ecef',
   alignItems: 'center',
 })
 

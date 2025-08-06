@@ -449,7 +449,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
           </table>
         </div>
       )}
-      
+
       <footer className={styles.footer}>
         <div className={styles.footerContent}>
           <div className={styles.footerSection}>

@@ -10,11 +10,8 @@ import NewLineVisibilityPlugin from '@/components/editorplugins/NewLineVisibilit
 import PageBreakPlugin from '@/components/editorplugins/PageBreakPlugin.tsx'
 import * as styles from './TategakiEditor.css'
 import CurrentInfo from './editorplugins/CurrentInfo'
-import { RubyNode, RubyPlugin } from './editorplugins/RubyNode'
-import {
-  TateChuYokoNode,
-  TateChuYokoPlugin,
-} from './editorplugins/TateChuYokoNode'
+import { RubyPlugin } from './editorplugins/RubyNode'
+import { TateChuYokoPlugin } from './editorplugins/TateChuYokoNode'
 
 interface TategakiEditorProps {
   initialContent?: string

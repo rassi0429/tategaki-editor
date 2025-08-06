@@ -1,3 +1,5 @@
+import { LexicalComposer } from '@lexical/react/LexicalComposer'
+import { HeadingNode, QuoteNode } from '@lexical/rich-text'
 import type React from 'react'
 import { useEffect, useState } from 'react'
 import {
@@ -7,12 +9,10 @@ import {
 } from '../utils/documentManager'
 import * as styles from './EditorPage.css'
 import TategakiEditor from './TategakiEditor'
-import { LexicalComposer } from '@lexical/react/LexicalComposer'
-import { HeadingNode, QuoteNode } from '@lexical/rich-text'
+import * as editorStyles from './TategakiEditor.css'
 import { RubyNode } from './editorplugins/RubyNode'
 import { TateChuYokoNode } from './editorplugins/TateChuYokoNode'
 import ToolbarPlugin from './editorplugins/ToolbarPlugin'
-import * as editorStyles from './TategakiEditor.css'
 
 interface EditorPageProps {
   documentId: string

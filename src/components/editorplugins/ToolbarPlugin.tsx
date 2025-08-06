@@ -3,13 +3,18 @@ import { $createHeadingNode, type HeadingTagType } from '@lexical/rich-text'
 import { $setBlocksType } from '@lexical/selection'
 import {
   $createParagraphNode,
+  $createTextNode,
   $getSelection,
+  $isElementNode,
   $isRangeSelection,
   FORMAT_TEXT_COMMAND,
+  type LexicalNode,
   SELECTION_CHANGE_COMMAND,
 } from 'lexical'
 import { useCallback, useEffect, useState } from 'react'
 
+import { $createRubyNode } from './RubyNode'
+import { $createTateChuYokoNode, $isTateChuYokoNode } from './TateChuYokoNode'
 import * as styles from './ToolbarPlugin.css'
 
 interface ToolbarState {
@@ -54,6 +59,21 @@ export default function ToolbarPlugin() {
     )
   }, [editor, updateToolbar])
 
+  const replaceSelectionWithNode = (
+    nodeCreator: (text: string) => LexicalNode
+  ) => {
+    const selection = $getSelection()
+    if ($isRangeSelection(selection) && !selection.isCollapsed()) {
+      const selectedText = selection.getTextContent()
+      const newNode = nodeCreator(selectedText)
+      if ($isElementNode(newNode)) {
+        const textNode = $createTextNode(selectedText)
+        newNode.append(textNode)
+      }
+      selection.insertNodes([newNode])
+    }
+  }
+
   const formatText = (
     format: 'bold' | 'italic' | 'strikethrough' | 'underline'
   ) => {
@@ -74,6 +94,48 @@ export default function ToolbarPlugin() {
       const selection = $getSelection()
       if ($isRangeSelection(selection)) {
         $setBlocksType(selection, () => $createParagraphNode())
+      }
+    })
+  }
+
+  const formatRuby = () => {
+    const rubyText = prompt('ルビのテキストを入力してください:', '')
+    if (rubyText === null || rubyText.trim() === '') {
+      return
+    }
+
+    editor.update(() => {
+      replaceSelectionWithNode(() => $createRubyNode(rubyText))
+    })
+  }
+
+  const formatTateChuYoko = () => {
+    editor.update(() => {
+      const selection = $getSelection()
+      if ($isRangeSelection(selection)) {
+        // 現在の選択が縦中横ノード内にあるかチェック
+        const nodes = selection.getNodes()
+        let tateChuYokoNode = null
+
+        for (const node of nodes) {
+          const parent = node.getParent()
+          if ($isTateChuYokoNode(parent)) {
+            tateChuYokoNode = parent
+            break
+          }
+        }
+
+        if (tateChuYokoNode) {
+          // 縦中横ノードをTextNodeに戻す
+          const textContent = tateChuYokoNode.getTextContent()
+          const newTextNode = $createTextNode(textContent)
+          tateChuYokoNode.replace(newTextNode)
+          // 新しいノードに選択を移動
+          newTextNode.select()
+        } else {
+          // 通常の縦中横作成処理
+          replaceSelectionWithNode(() => $createTateChuYokoNode())
+        }
       }
     })
   }
@@ -116,6 +178,22 @@ export default function ToolbarPlugin() {
           aria-label="下線"
         >
           <u>線</u>
+        </button>
+        <button
+          type="button"
+          className={styles.toolbarButton}
+          onClick={() => formatRuby()}
+          aria-label="ルビ"
+        >
+          ルビ
+        </button>
+        <button
+          type="button"
+          className={styles.toolbarButton}
+          onClick={() => formatTateChuYoko()}
+          aria-label="縦中横"
+        >
+          縦中横
         </button>
       </div>
 

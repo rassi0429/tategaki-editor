@@ -13,6 +13,11 @@ import ToolbarPlugin from '@/components/editorplugins/ToolbarPlugin'
 import PageBreakPlugin from '@/components/editorplugins/PageBreakPlugin.tsx'
 import * as styles from './TategakiEditor.css'
 import CurrentInfo from './editorplugins/CurrentInfo'
+import { RubyNode, RubyPlugin } from './editorplugins/RubyNode'
+import {
+  TateChuYokoNode,
+  TateChuYokoPlugin,
+} from './editorplugins/TateChuYokoNode'
 
 interface TategakiEditorProps {
   initialContent?: string
@@ -32,7 +37,7 @@ function TategakiEditor({
   const initialConfig = {
     namespace: 'TategakiEditor',
     theme: styles.theme,
-    nodes: [HeadingNode, QuoteNode],
+    nodes: [HeadingNode, QuoteNode, RubyNode, TateChuYokoNode],
     onError(error: Error) {
       console.error('Lexical error:', error)
     },
@@ -44,10 +49,21 @@ function TategakiEditor({
 
     const handleWheel = (event: Event) => {
       const wheelEvent = event as WheelEvent
-      console.log('Lexical editor:', wheelEvent)
-      console.log('editorElement:', editorElement)
       wheelEvent.preventDefault()
-      editorElement.scrollLeft -= wheelEvent.deltaY
+      const direction: -1 | 1 = (() => {
+        if (wheelEvent.deltaX < 0) return 1
+        if (wheelEvent.deltaX > 0) return -1
+        if (wheelEvent.deltaY > 0) return 1
+        if (wheelEvent.deltaY < 0) return -1
+        return 1
+      })()
+      const distance =
+        direction *
+        Math.sqrt(
+          wheelEvent.deltaX * wheelEvent.deltaX +
+            wheelEvent.deltaY * wheelEvent.deltaY
+        )
+      editorElement.scrollLeft -= distance
     }
 
     editorElement.parentNode.addEventListener('wheel', handleWheel, {
@@ -65,13 +81,20 @@ function TategakiEditor({
     <div className={styles.container}>
       <LexicalComposer initialConfig={initialConfig}>
         <ToolbarPlugin />
+        <RubyPlugin />
+        <TateChuYokoPlugin />
         <NewLineVisibilityPlugin />
         <div className={styles.editor} ref={editorRef}>
           <RichTextPlugin
             contentEditable={<ContentEditable className={styles.input} />}
             placeholder={
               <div className={styles.placeholder}>
-                縦書きテキストを入力してください...
+                <ruby>
+                  縦書き<rp>(</rp>
+                  <rt>たてがき</rt>
+                  <rp>)</rp>
+                </ruby>
+                テキストを入力してください...
               </div>
             }
             ErrorBoundary={LexicalErrorBoundary}

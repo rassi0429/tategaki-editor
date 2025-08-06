@@ -4,7 +4,9 @@ import {
   type Document,
   createDocument,
   deleteDocument,
+  generateUUID,
   getDocuments,
+  saveDocuments,
 } from '../utils/documentManager'
 import * as styles from './DocumentList.css'
 
@@ -144,6 +146,68 @@ export const DocumentList: React.FC<DocumentListProps> = ({
     }
   }
 
+  const handleExport = (e: React.MouseEvent, doc: Document) => {
+    e.stopPropagation()
+    const exportData = {
+      title: doc.title,
+      content: doc.content,
+      createdAt: doc.createdAt,
+      updatedAt: doc.updatedAt,
+    }
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+      type: 'application/json',
+    })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${doc.title}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  const handleImport = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.json'
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (file) {
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          try {
+            const importData = JSON.parse(e.target?.result as string)
+            if (importData.title && importData.content) {
+              const documents = getDocuments()
+              const newDoc: Document = {
+                id: generateUUID(),
+                title: importData.title,
+                content: importData.content,
+                createdAt: importData.createdAt
+                  ? new Date(importData.createdAt)
+                  : new Date(),
+                updatedAt: importData.updatedAt
+                  ? new Date(importData.updatedAt)
+                  : new Date(),
+              }
+              documents.push(newDoc)
+              saveDocuments(documents)
+              loadDocuments()
+              alert('文書をインポートしました。')
+            } else {
+              alert('不正なファイル形式です。')
+            }
+          } catch {
+            alert('ファイルの読み込みに失敗しました。')
+          }
+        }
+        reader.readAsText(file)
+      }
+    }
+    input.click()
+  }
+
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
@@ -192,6 +256,13 @@ export const DocumentList: React.FC<DocumentListProps> = ({
           <button
             type="button"
             className={styles.newButton}
+            onClick={handleImport}
+          >
+            インポート
+          </button>
+          <button
+            type="button"
+            className={styles.newButton}
             onClick={handleCreateNew}
           >
             新規作成
@@ -229,13 +300,22 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                   }
                 }}
               >
-                <button
-                  type="button"
-                  className={styles.cardDeleteButton}
-                  onClick={(e) => handleDelete(e, doc.id)}
-                >
-                  削除
-                </button>
+                <div className={styles.cardActions}>
+                  <button
+                    type="button"
+                    className={styles.cardActionButton}
+                    onClick={(e) => handleExport(e, doc)}
+                  >
+                    エクスポート
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.cardDeleteButton}
+                    onClick={(e) => handleDelete(e, doc.id)}
+                  >
+                    削除
+                  </button>
+                </div>
                 <h3 className={styles.documentTitle}>{doc.title}</h3>
                 <p className={styles.summaryText}>
                   {preview ? `${preview}...` : '(空の文書)'}
@@ -346,6 +426,13 @@ export const DocumentList: React.FC<DocumentListProps> = ({
                         }}
                       >
                         編集
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.exportButton}
+                        onClick={(e) => handleExport(e, doc)}
+                      >
+                        エクスポート
                       </button>
                       <button
                         type="button"

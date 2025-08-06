@@ -55,7 +55,7 @@ function PageBreakPlugin({
         ).getBoundingClientRect()
 
         const width = viewportWidth - rect.left - editorContainer.scrollLeft
-        console.log(domElement?.parentNode, width)
+        // console.log(domElement?.parentNode, width)
 
         if (width - lastWidth > maxWidth) {
           // console.log(`Page break detected for node: ${nodeKey}, width: ${width}, lastWidth: ${lastWidth}`)

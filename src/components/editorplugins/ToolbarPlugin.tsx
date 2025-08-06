@@ -83,7 +83,11 @@ export default function ToolbarPlugin() {
     editor.update(() => {
       const selection = $getSelection()
       if ($isRangeSelection(selection)) {
-        insertRuby(editor, 'ルビのテキスト', 'よみ')
+        const baseText = selection.getTextContent()
+        const rubyText = prompt('ルビのテキストを入力してください:', '')
+        if (rubyText !== null) {
+          insertRuby(editor, baseText, rubyText)
+        }
       }
     })
   }

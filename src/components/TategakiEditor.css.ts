@@ -65,8 +65,8 @@ export const theme: EditorThemeClasses = {
   heading: {
     h1: style({ fontSize: '2em', fontWeight: 'bold' }),
     h2: style({ fontSize: '1.5em', fontWeight: 'bold' }),
-    h3: style({ fontSize: '1.17em', fontWeight: 'bold' }),
-    h4: style({ fontSize: '1em', fontWeight: 'bold' }),
+    h3: style({ fontSize: '1.2em', fontWeight: 'normal' }),
+    h4: style({ fontSize: '0.85em', fontWeight: 'normal' }),
     h5: style({ fontSize: '1em', fontWeight: 'bold' }),
     h6: style({ fontSize: '1em', fontWeight: 'bold' }),
   },

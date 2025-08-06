@@ -202,6 +202,22 @@ export default function ToolbarPlugin() {
         <button
           type="button"
           className={styles.toolbarButton}
+          onClick={() => formatHeading('h1')}
+          aria-label="見出し大"
+        >
+          見出し大
+        </button>
+        <button
+          type="button"
+          className={styles.toolbarButton}
+          onClick={() => formatHeading('h2')}
+          aria-label="見出し小"
+        >
+          見出し小
+        </button>
+        <button
+          type="button"
+          className={styles.toolbarButton}
           onClick={() => formatParagraph()}
           aria-label="本文"
         >
@@ -210,34 +226,18 @@ export default function ToolbarPlugin() {
         <button
           type="button"
           className={styles.toolbarButton}
-          onClick={() => formatHeading('h1')}
-          aria-label="見出し1"
-        >
-          H1
-        </button>
-        <button
-          type="button"
-          className={styles.toolbarButton}
-          onClick={() => formatHeading('h2')}
-          aria-label="見出し2"
-        >
-          H2
-        </button>
-        <button
-          type="button"
-          className={styles.toolbarButton}
           onClick={() => formatHeading('h3')}
-          aria-label="見出し3"
+          aria-label="本文大"
         >
-          H3
+          本文大
         </button>
         <button
           type="button"
           className={styles.toolbarButton}
           onClick={() => formatHeading('h4')}
-          aria-label="見出し4"
+          aria-label="本文小"
         >
-          H4
+          本文小
         </button>
       </div>
     </div>

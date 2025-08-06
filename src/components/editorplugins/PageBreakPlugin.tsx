@@ -14,12 +14,16 @@ function PageBreakPlugin({
 }: PageBreakPluginProps) {
   const [editor] = useLexicalComposerContext()
 
+
+
   const calculateNodePositions = useCallback(() => {
     editor.getEditorState().read(() => {
       const root = $getRoot()
       const allNodes = root.getAllTextNodes()
       const editorContainer = editor.getRootElement()
       if (!editorContainer) return
+
+      const scaleWidth = (editorContainer.clientHeight / 400) * maxWidth
 
       let lastWidth = 0
 
@@ -43,7 +47,7 @@ function PageBreakPlugin({
         const rect = parentElement.getBoundingClientRect()
         const width = viewportWidth - rect.left - scrollLeft
 
-        if (width - lastWidth > maxWidth) {
+        if (width - lastWidth > scaleWidth) {
           parentElement.classList.add(pageBreakIndicator)
           onPageBreak?.(nodeKey, pageNumber)
           pageNumber++

@@ -179,6 +179,21 @@ export const documentMeta = style({
   marginBottom: '0.25rem',
 })
 
+export const exportButton = style({
+  backgroundColor: '#10b981',
+  color: 'white',
+  border: 'none',
+  borderRadius: '0.375rem',
+  padding: '0.375rem 0.75rem',
+  fontSize: '0.875rem',
+  cursor: 'pointer',
+  marginRight: '0.5rem',
+  transition: 'background-color 0.2s',
+  ':hover': {
+    backgroundColor: '#059669',
+  },
+})
+
 export const deleteButton = style({
   backgroundColor: '#ef4444',
   color: 'white',
@@ -193,10 +208,36 @@ export const deleteButton = style({
   },
 })
 
-export const cardDeleteButton = style({
+export const cardActions = style({
   position: 'absolute',
   top: '1rem',
   right: '1rem',
+  display: 'flex',
+  gap: '0.5rem',
+  opacity: 0,
+  transition: 'opacity 0.2s',
+  selectors: {
+    [`${documentCard}:hover &`]: {
+      opacity: 1,
+    },
+  },
+})
+
+export const cardActionButton = style({
+  backgroundColor: '#10b981',
+  color: 'white',
+  border: 'none',
+  borderRadius: '0.375rem',
+  padding: '0.25rem 0.5rem',
+  fontSize: '0.75rem',
+  cursor: 'pointer',
+  transition: 'background-color 0.2s',
+  ':hover': {
+    backgroundColor: '#059669',
+  },
+})
+
+export const cardDeleteButton = style({
   backgroundColor: '#ef4444',
   color: 'white',
   border: 'none',
@@ -204,15 +245,9 @@ export const cardDeleteButton = style({
   padding: '0.25rem 0.5rem',
   fontSize: '0.75rem',
   cursor: 'pointer',
-  opacity: 0,
-  transition: 'opacity 0.2s',
+  transition: 'background-color 0.2s',
   ':hover': {
     backgroundColor: '#dc2626',
-  },
-  selectors: {
-    [`${documentCard}:hover &`]: {
-      opacity: 1,
-    },
   },
 })
 

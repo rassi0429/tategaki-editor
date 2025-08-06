@@ -14,8 +14,6 @@ function PageBreakPlugin({
 }: PageBreakPluginProps) {
   const [editor] = useLexicalComposerContext()
 
-
-
   const calculateNodePositions = useCallback(() => {
     editor.getEditorState().read(() => {
       const root = $getRoot()

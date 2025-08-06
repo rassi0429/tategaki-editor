@@ -1,7 +1,7 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { useEffect, useState } from 'react'
-import PageBreakPlugin, { type NodePosition } from './PageBreakPlugin'
 import * as styles from './PageBreakIndicator.css'
+import PageBreakPlugin from './PageBreakPlugin'
 
 interface PageBreakIndicatorProps {
   maxWidth?: number
@@ -13,9 +13,9 @@ interface PageBreak {
   pageNumber: number
 }
 
-function PageBreakIndicator({ 
-  maxWidth = 800, 
-  showPageNumbers = true 
+function PageBreakIndicator({
+  maxWidth = 800,
+  showPageNumbers = true,
 }: PageBreakIndicatorProps) {
   const [editor] = useLexicalComposerContext()
   const [pageBreaks, setPageBreaks] = useState<PageBreak[]>([])
@@ -29,13 +29,13 @@ function PageBreakIndicator({
 
     const rect = element.getBoundingClientRect()
     const containerRect = editorContainer.getBoundingClientRect()
-    
+
     // For vertical-rl, calculate position from the right edge of the container
     const position = containerRect.right - rect.right
 
-    setPageBreaks(prev => {
+    setPageBreaks((prev) => {
       // Avoid duplicate page breaks at the same position
-      const exists = prev.some(pb => Math.abs(pb.position - position) < 5)
+      const exists = prev.some((pb) => Math.abs(pb.position - position) < 5)
       if (exists) return prev
 
       const newBreaks = [...prev, { position, pageNumber }]
@@ -56,25 +56,18 @@ function PageBreakIndicator({
 
   return (
     <>
-      <PageBreakPlugin 
-        maxWidth={maxWidth} 
-        onPageBreak={handlePageBreak}
-      />
-      
+      <PageBreakPlugin maxWidth={maxWidth} onPageBreak={handlePageBreak} />
+
       {/* Render page break indicators */}
-      {pageBreaks.map((pageBreak, index) => (
+      {pageBreaks.map((pageBreak, _index) => (
         <div
           key={`${pageBreak.position}-${pageBreak.pageNumber}`}
           className={styles.pageBreakIndicator}
-          style={{ 
-            right: pageBreak.position
+          style={{
+            right: pageBreak.position,
           }}
         >
-          {showPageNumbers && (
-            <div className={styles.pageNumber}>
-              {pageBreak.pageNumber}ページ
-            </div>
-          )}
+          {showPageNumbers && <div>{pageBreak.pageNumber}ページ</div>}
         </div>
       ))}
     </>

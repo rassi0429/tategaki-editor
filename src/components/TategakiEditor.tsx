@@ -9,9 +9,9 @@ import CustomOnChangePlugin from '@/components/editorplugins/CustomOnChangePlugi
 import NewLineVisibilityPlugin from '@/components/editorplugins/NewLineVisibilityPlugin'
 import ToolbarPlugin from '@/components/editorplugins/ToolbarPlugin'
 
+import PageBreakPlugin from '@/components/editorplugins/PageBreakPlugin.tsx'
 import * as styles from './TategakiEditor.css'
 import CurrentInfo from './editorplugins/CurrentInfo'
-import PageBreakPlugin from "@/components/editorplugins/PageBreakPlugin.tsx";
 
 interface TategakiEditorProps {
   initialContent?: string

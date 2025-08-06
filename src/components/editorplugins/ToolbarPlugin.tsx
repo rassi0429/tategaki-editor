@@ -1,13 +1,15 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $createHeadingNode, type HeadingTagType } from '@lexical/rich-text'
 import { $setBlocksType } from '@lexical/selection'
-import { $wrapNodes } from '@lexical/selection'
 import {
   $createParagraphNode,
+  $createTextNode,
   $getSelection,
+  $isElementNode,
   $isRangeSelection,
   FORMAT_TEXT_COMMAND,
   SELECTION_CHANGE_COMMAND,
+  type LexicalNode,
 } from 'lexical'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -56,6 +58,19 @@ export default function ToolbarPlugin() {
     )
   }, [editor, updateToolbar])
 
+  const replaceSelectionWithNode = (nodeCreator: (text: string) => LexicalNode) => {
+    const selection = $getSelection()
+    if ($isRangeSelection(selection) && !selection.isCollapsed()) {
+      const selectedText = selection.getTextContent()
+      const newNode = nodeCreator(selectedText)
+      if ($isElementNode(newNode)) {
+        const textNode = $createTextNode(selectedText)
+        newNode.append(textNode)
+      }
+      selection.insertNodes([newNode])
+    }
+  }
+
   const formatText = (
     format: 'bold' | 'italic' | 'strikethrough' | 'underline'
   ) => {
@@ -66,7 +81,7 @@ export default function ToolbarPlugin() {
     editor.update(() => {
       const selection = $getSelection()
       if ($isRangeSelection(selection)) {
-        $setBlocksType(selection, () => $createHeadingNode(headingSize))
+          $setBlocksType(selection, () => $createHeadingNode(headingSize))
       }
     })
   }
@@ -87,10 +102,7 @@ export default function ToolbarPlugin() {
     }
 
     editor.update(() => {
-      const selection = $getSelection()
-      if ($isRangeSelection(selection)) {
-        $wrapNodes(selection, () => $createRubyNode(rubyText))
-      }
+      replaceSelectionWithNode(() => $createRubyNode(rubyText))
     })
   }
 

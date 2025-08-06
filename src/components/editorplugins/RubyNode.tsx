@@ -55,41 +55,46 @@ export class RubyNode extends ElementNode {
     }
   }
 
+  _updateRtElement(dom: HTMLElement): void {
+    const newRubyText = this.getRubyText()
+    let rtElement = dom.querySelector('rt')
+
+    if (rtElement === null) {
+      rtElement = document.createElement('rt')
+      rtElement.style.cursor = 'pointer'
+      rtElement.contentEditable = 'false'
+      dom.appendChild(rtElement)
+    }
+
+    if (rtElement.innerText !== newRubyText) {
+      rtElement.innerText = newRubyText
+    }
+  }
+
   createDOM(_config: EditorConfig, editor: LexicalEditor): HTMLElement {
     const element = document.createElement('ruby')
 
-    const rtElement = document.createElement('rt')
-    rtElement.style.cursor = 'pointer'
-    rtElement.innerText = this.__rubyText
-    rtElement.contentEditable = 'false'
-    element.append(rtElement)
-
-    rtElement.addEventListener('click', (event) => {
+    element.addEventListener('click', (event) => {
       event.preventDefault()
-      editor.read(() => {
+      editor.update(() => {
         const node = this.getLatest()
         const newRubyText = prompt('ルビを編集:', node.getRubyText())
-
         if (newRubyText !== null && newRubyText !== node.getRubyText()) {
-          editor.update(() => {
-            this.getWritable().setRubyText(newRubyText)
-          })
+          this.getWritable().setRubyText(newRubyText)
         }
       })
     })
 
+    setTimeout(() => (
+      editor.update(() => {
+        this._updateRtElement(element)
+      })))
 
     return element
   }
 
-  updateDOM(prevNode: RubyNode, dom: HTMLElement): boolean {
-    const rtElement = dom.querySelector('rt')
-    if (rtElement) {
-      if (prevNode.__rubyText !== this.__rubyText) {
-        rtElement.innerText = this.__rubyText
-      }
-      dom.append(rtElement)
-    }
+  updateDOM(_prevNode: RubyNode, dom: HTMLElement): boolean {
+    this._updateRtElement(dom)
     return false
   }
 

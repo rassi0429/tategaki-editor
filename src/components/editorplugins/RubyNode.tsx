@@ -1,3 +1,8 @@
+import { type ReactNode, useEffect, useRef, useState } from 'react'
+
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection'
+import { mergeRegister } from '@lexical/utils'
 import {
   $applyNodeReplacement,
   $getSelection,
@@ -9,9 +14,8 @@ import {
   type NodeKey,
   type SerializedLexicalNode,
   type Spread,
+  createCommand,
 } from 'lexical'
-import * as React from 'react'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 
 // RubyNodeのシリアライズ形式
 export type SerializedRubyNode = Spread<
@@ -24,26 +28,113 @@ export type SerializedRubyNode = Spread<
   SerializedLexicalNode
 >
 
+export const CLICK_COMMAND = createCommand<MouseEvent>('CLICK_COMMAND')
+
 // ルビタグをレンダリングするためのReactコンポーネント
 function RubyComponent({
-  baseText,
-  rubyText,
+  baseText: initialBaseText,
+  rubyText: initialRubyText,
   nodeKey,
 }: {
   baseText: string
   rubyText: string
   nodeKey: NodeKey
 }) {
+  const [editor] = useLexicalComposerContext()
+  const [isSelected, setSelected, clearSelection] =
+    useLexicalNodeSelection(nodeKey)
+  const [isEditing, setIsEditing] = useState(false)
+  const [baseText, setBaseText] = useState(initialBaseText)
+  const [rubyText, setRubyText] = useState(initialRubyText)
+  const inputRef = useRef<HTMLInputElement | null>(null)
+
+  const handleSave = () => {
+    editor.update(() => {
+      const node = editor.getEditorState()._nodeMap.get(nodeKey)
+      if ($isRubyNode(node)) {
+        node.setBaseText(baseText)
+        node.setRubyText(rubyText)
+      }
+    })
+    setIsEditing(false)
+  }
+
+  useEffect(() => {
+    if (isEditing) {
+      inputRef.current?.focus()
+    }
+  }, [isEditing])
+
+  useEffect(() => {
+    return mergeRegister(
+      editor.registerCommand(
+        CLICK_COMMAND,
+        (payload) => {
+          const event = payload as MouseEvent
+          if (event.target === inputRef.current) {
+            return false
+          }
+          if (isSelected) {
+            setIsEditing(true)
+            return true
+          }
+          return false
+        },
+        1
+      )
+    )
+  }, [editor, isSelected])
+
+  if (isEditing) {
+    return (
+      <span ref={inputRef}>
+        <input
+          type="text"
+          value={baseText}
+          onChange={(e) => setBaseText(e.target.value)}
+          style={{ width: '5em' }}
+        />
+        <input
+          type="text"
+          value={rubyText}
+          onChange={(e) => setRubyText(e.target.value)}
+          style={{ width: '5em' }}
+        />
+        <button type="button" onClick={handleSave}>
+          Save
+        </button>
+      </span>
+    )
+  }
+
   return (
-    <ruby data-lexical-decorator="true" data-lexical-node-key={nodeKey}>
-      {baseText}
-      <rt>{rubyText}</rt>
+    <ruby
+      ref={inputRef}
+      data-lexical-decorator="true"
+      data-lexical-node-key={nodeKey}
+      className={isSelected ? 'selected' : ''}
+      onClick={() => {
+        clearSelection()
+        setSelected(true)
+        setIsEditing(true)
+      }}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          clearSelection()
+          setSelected(true)
+          setIsEditing(true)
+        }
+      }}
+    >
+      {initialBaseText}
+      <rt>{initialRubyText}</rt>
     </ruby>
   )
 }
 
 // RubyNode クラス
-export class RubyNode extends DecoratorNode<React.ReactNode> {
+export class RubyNode extends DecoratorNode<ReactNode> {
   __baseText: string
   __rubyText: string
 
@@ -91,7 +182,17 @@ export class RubyNode extends DecoratorNode<React.ReactNode> {
     return true
   }
 
-  decorate(): React.ReactNode {
+  setBaseText(newBaseText: string) {
+    const writable = this.getWritable()
+    writable.__baseText = newBaseText
+  }
+
+  setRubyText(newRubyText: string) {
+    const writable = this.getWritable()
+    writable.__rubyText = newRubyText
+  }
+
+  decorate(): ReactNode {
     return (
       <RubyComponent
         baseText={this.__baseText}
@@ -117,7 +218,7 @@ export function $isRubyNode(
 // プラグイン用の設定
 export const RubyPlugin = (): JSX.Element | null => {
   const [editor] = useLexicalComposerContext()
-  React.useEffect(() => {
+  useEffect(() => {
     if (!editor.hasNode(RubyNode)) {
       throw new Error('RubyPlugin: RubyNode not registered on editor')
     }

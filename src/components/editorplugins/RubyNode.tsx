@@ -1,12 +1,10 @@
-import { type ReactNode, useEffect, useRef, useState } from 'react'
+import { useEffect, } from 'react'
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection'
 import {
-  $getNodeByKey,
   ElementNode,
-  type EditorConfig,
   type LexicalEditor,
+  type EditorConfig,
   type LexicalNode,
   type NodeKey,
   type SerializedElementNode,
@@ -22,82 +20,6 @@ export type SerializedRubyNode = Spread<
   },
   SerializedElementNode
 >
-
-// ルビタグをレンダリングするためのReactコンポーネント
-function RubyComponent({
-  rubyText: initialRubyText,
-  nodeKey,
-  children,
-}: {
-  rubyText: string
-  nodeKey: NodeKey
-  children: ReactNode
-}) {
-  const [editor] = useLexicalComposerContext()
-  const [isSelected] = useLexicalNodeSelection(nodeKey)
-  const [isEditing, setIsEditing] = useState(false)
-  const [rubyText, setRubyText] = useState(initialRubyText)
-  const inputRef = useRef<HTMLInputElement>(null)
-
-  const handleSave = () => {
-    editor.update(() => {
-      const node = $getNodeByKey(nodeKey)
-      if ($isRubyNode(node)) {
-        node.setRubyText(rubyText)
-      }
-    })
-    setIsEditing(false)
-  }
-
-  useEffect(() => {
-    if (isEditing) {
-      inputRef.current?.focus()
-    }
-  }, [isEditing])
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      handleSave()
-    } else if (event.key === 'Escape') {
-      setIsEditing(false)
-      setRubyText(initialRubyText)
-    }
-  }
-
-  return (
-    <ruby className={isSelected ? 'selected' : ''}>
-      {children}
-      <rt>
-        {isEditing ? (
-          <input
-            ref={inputRef}
-            value={rubyText}
-            onChange={(e) => setRubyText(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onBlur={handleSave}
-            style={{ width: '5em' }}
-          />
-        ) : (
-          <button
-            type="button"
-            onClick={() => setIsEditing(true)}
-            onKeyDown={(e) => e.key === 'Enter' && setIsEditing(true)}
-            style={{
-              background: 'none',
-              border: 'none',
-              padding: 0,
-              font: 'inherit',
-              color: 'inherit',
-              cursor: 'pointer',
-            }}
-          >
-            {initialRubyText}
-          </button>
-        )}
-      </rt>
-    </ruby>
-  )
-}
 
 // RubyNode クラス
 export class RubyNode extends ElementNode {
@@ -133,18 +55,37 @@ export class RubyNode extends ElementNode {
     }
   }
 
-  createDOM(_config: EditorConfig): HTMLElement {
+  createDOM(_config: EditorConfig, editor: LexicalEditor): HTMLElement {
     const element = document.createElement('ruby')
-    const rubyTextElement = document.createElement('rt')
-    rubyTextElement.innerText = this.__rubyText
-    element.appendChild(rubyTextElement)
+    const rtElement = document.createElement('rt')
+    rtElement.innerText = this.__rubyText
+    element.append(rtElement)
+
+    // rtElement内のテキストが更新されたときに、RubyNodeの状態も更新したい
+    const observer = new MutationObserver(() => {
+      if (rtElement.innerText !== this.__rubyText) {
+        editor.update(() => {
+          this.setRubyText(rtElement.innerText)
+        })
+      }
+    });
+
+    observer.observe(rtElement, {
+      childList: true,
+      subtree: true,
+      characterData: true
+    });
+
     return element
   }
 
   updateDOM(prevNode: RubyNode, dom: HTMLElement): boolean {
     const rtElement = dom.querySelector('rt')
-    if (rtElement && prevNode.__rubyText !== this.__rubyText) {
-      rtElement.innerText = this.__rubyText
+    if (rtElement) {
+      if (prevNode.__rubyText !== this.__rubyText) {
+        rtElement.innerText = this.__rubyText
+      }
+      dom.append(rtElement)
     }
     return false
   }
@@ -160,23 +101,6 @@ export class RubyNode extends ElementNode {
 
   isInline(): boolean {
     return true
-  }
-
-  // ElementNodeはdecorateを直接使わないが、
-  // Reactコンポーネントでレンダリングを制御したい場合に備えておく
-  decorate(editor: LexicalEditor, config: EditorConfig): ReactNode {
-    return (
-      <RubyComponent rubyText={this.getRubyText()} nodeKey={this.getKey()}>
-        {this.getChildren().map((child) => {
-          // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-          if (typeof (child as any).decorate === 'function') {
-            // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-            return (child as any).decorate(editor, config)
-          }
-          return null // または適切なデフォルトのレンダリング
-        })}
-      </RubyComponent>
-    )
   }
 }
 

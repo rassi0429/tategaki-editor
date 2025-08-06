@@ -11,6 +11,7 @@ import {
   type SerializedElementNode,
   type Spread,
 } from 'lexical'
+import * as styles from './RubyNode.css'
 
 // RubyNodeのシリアライズ形式
 export type SerializedRubyNode = Spread<
@@ -62,7 +63,7 @@ export class RubyNode extends ElementNode {
 
     if (rtElement === null) {
       rtElement = document.createElement('rt')
-      rtElement.style.cursor = 'pointer'
+      rtElement.className = styles.rubyText
       rtElement.contentEditable = 'false'
       dom.appendChild(rtElement)
     }

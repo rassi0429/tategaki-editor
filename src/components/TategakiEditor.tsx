@@ -45,10 +45,18 @@ function TategakiEditor({
 
     const handleWheel = (event: Event) => {
       const wheelEvent = event as WheelEvent
-      console.log('Lexical editor:', wheelEvent)
-      console.log('editorElement:', editorElement)
       wheelEvent.preventDefault()
-      editorElement.scrollLeft -= wheelEvent.deltaY
+      const direction: -1 | 1 = (() => {
+        if (wheelEvent.deltaX > 0) return 1
+        if (wheelEvent.deltaX < 0) return -1
+        if (wheelEvent.deltaY > 0) return 1
+        if (wheelEvent.deltaY < 0) return -1
+        return 1
+      })()
+      const distance = direction * Math.sqrt(
+        wheelEvent.deltaX * wheelEvent.deltaX + wheelEvent.deltaY * wheelEvent.deltaY
+      )
+      editorElement.scrollLeft -= distance
     }
 
     editorElement.parentNode.addEventListener('wheel', handleWheel, {

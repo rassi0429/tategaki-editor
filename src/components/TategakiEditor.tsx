@@ -11,6 +11,7 @@ import ToolbarPlugin from '@/components/editorplugins/ToolbarPlugin'
 
 import * as styles from './TategakiEditor.css'
 import CurrentInfo from './editorplugins/CurrentInfo'
+import PageBreakPlugin from "@/components/editorplugins/PageBreakPlugin.tsx";
 
 interface TategakiEditorProps {
   initialContent?: string
@@ -51,6 +52,7 @@ function TategakiEditor({
           />
           <HistoryPlugin />
           <CurrentInfo />
+          <PageBreakPlugin />
           <CustomOnChangePlugin
             {...((onChange ?? onSave) && { onChange: onChange ?? onSave })}
             {...((initialEditorState || initialContent) && {

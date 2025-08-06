@@ -8,8 +8,8 @@ import {
   $isElementNode,
   $isRangeSelection,
   FORMAT_TEXT_COMMAND,
-  SELECTION_CHANGE_COMMAND,
   type LexicalNode,
+  SELECTION_CHANGE_COMMAND,
 } from 'lexical'
 import { useCallback, useEffect, useState } from 'react'
 

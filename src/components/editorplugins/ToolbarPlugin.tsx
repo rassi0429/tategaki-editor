@@ -179,6 +179,22 @@ export default function ToolbarPlugin() {
         >
           <u>線</u>
         </button>
+        <button
+          type="button"
+          className={styles.toolbarButton}
+          onClick={() => formatRuby()}
+          aria-label="ルビ"
+        >
+          ルビ
+        </button>
+        <button
+          type="button"
+          className={styles.toolbarButton}
+          onClick={() => formatTateChuYoko()}
+          aria-label="縦中横"
+        >
+          縦中横
+        </button>
       </div>
 
       <div className={styles.toolbarSection}>
@@ -222,22 +238,6 @@ export default function ToolbarPlugin() {
           aria-label="見出し4"
         >
           H4
-        </button>
-        <button
-          type="button"
-          className={styles.toolbarButton}
-          onClick={() => formatRuby()}
-          aria-label="ルビ"
-        >
-          ルビ
-        </button>
-        <button
-          type="button"
-          className={styles.toolbarButton}
-          onClick={() => formatTateChuYoko()}
-          aria-label="縦中横"
-        >
-          縦中横
         </button>
       </div>
     </div>

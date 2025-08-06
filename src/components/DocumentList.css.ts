@@ -2,6 +2,9 @@ import { style } from '@vanilla-extract/css'
 
 export const container = style({
   width: '100%',
+  minHeight: '100vh',
+  display: 'flex',
+  flexDirection: 'column',
   margin: '0 auto',
   paddingLeft: '1rem',
   paddingRight: '1rem',
@@ -39,11 +42,14 @@ export const documentGrid = style({
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
   gap: '1.5rem',
+  alignContent: 'start',
+  flex: 1,
 })
 
 export const tableContainer = style({
   width: '100%',
   overflowX: 'auto',
+  flex: 1,
 })
 
 export const documentTable = style({
@@ -290,6 +296,7 @@ export const emptyState = style({
   textAlign: 'center',
   padding: '4rem 2rem',
   color: '#6b7280',
+  flex: 1,
 })
 
 export const emptyStateTitle = style({
@@ -301,4 +308,41 @@ export const emptyStateTitle = style({
 export const emptyStateText = style({
   fontSize: '1rem',
   marginBottom: '2rem',
+})
+
+export const footer = style({
+  marginTop: 'auto',
+  padding: '2rem 0',
+  borderTop: '1px solid #e5e7eb',
+  backgroundColor: '#f9fafb',
+})
+
+export const footerContent = style({
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: '2rem',
+  flexWrap: 'wrap',
+})
+
+export const footerSection = style({
+  display: 'flex',
+  alignItems: 'center',
+})
+
+export const footerLink = style({
+  color: '#3b82f6',
+  textDecoration: 'none',
+  fontSize: '0.875rem',
+  fontWeight: '500',
+  transition: 'color 0.2s',
+  ':hover': {
+    color: '#2563eb',
+    textDecoration: 'underline',
+  },
+})
+
+export const footerText = style({
+  color: '#6b7280',
+  fontSize: '0.875rem',
 })

@@ -1,10 +1,10 @@
-import { useEffect, } from 'react'
+import { useEffect } from 'react'
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
+  type EditorConfig,
   ElementNode,
   type LexicalEditor,
-  type EditorConfig,
   type LexicalNode,
   type NodeKey,
   type SerializedElementNode,
@@ -57,24 +57,27 @@ export class RubyNode extends ElementNode {
 
   createDOM(_config: EditorConfig, editor: LexicalEditor): HTMLElement {
     const element = document.createElement('ruby')
+
     const rtElement = document.createElement('rt')
+    rtElement.style.cursor = 'pointer'
     rtElement.innerText = this.__rubyText
+    rtElement.contentEditable = 'false'
     element.append(rtElement)
 
-    // rtElement内のテキストが更新されたときに、RubyNodeの状態も更新したい
-    const observer = new MutationObserver(() => {
-      if (rtElement.innerText !== this.__rubyText) {
-        editor.update(() => {
-          this.setRubyText(rtElement.innerText)
-        })
-      }
-    });
+    rtElement.addEventListener('click', (event) => {
+      event.preventDefault()
+      editor.read(() => {
+        const node = this.getLatest()
+        const newRubyText = prompt('ルビを編集:', node.getRubyText())
 
-    observer.observe(rtElement, {
-      childList: true,
-      subtree: true,
-      characterData: true
-    });
+        if (newRubyText !== null && newRubyText !== node.getRubyText()) {
+          editor.update(() => {
+            this.getWritable().setRubyText(newRubyText)
+          })
+        }
+      })
+    })
+
 
     return element
   }

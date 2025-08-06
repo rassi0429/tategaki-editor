@@ -11,7 +11,7 @@ export const header = style({
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  padding: "0.5rem",
+  padding: '0.5rem',
   // borderBottom: '2px solid #e5e7eb',
 })
 

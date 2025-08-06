@@ -90,6 +90,33 @@ export class RubyNode extends ElementNode {
         }
       })
     })
+
+    // MutationObserverで子要素の追加・削除を監視
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.type === 'childList') {
+          // 子要素が削除された場合、テキストコンテンツをチェック
+          if (mutation.removedNodes.length > 0) {
+            editor.update(() => {
+              const node = this.getLatest()
+              if (node instanceof RubyNode) {
+                node._checkAndReplaceWithTextNode()
+              }
+            })
+          }
+        }
+      }
+    })
+
+    observer.observe(element, { childList: true, subtree: true })
+
+    // 要素が削除される時にオブザーバーを解除
+    const originalRemove = element.remove
+    element.remove = function () {
+      observer.disconnect()
+      originalRemove.call(this)
+    }
+
     this._updateRtElement(element)
 
     // __lexicalLineBreakプロパティに入れておくとその前に子要素が入るようだが詳細は未確認
@@ -114,11 +141,6 @@ export class RubyNode extends ElementNode {
   _checkAndReplaceWithTextNode() {
     const rubyText = this.getRubyText()
     const textContent = this.getTextContent()
-
-    console.log('Checking RubyNode:', {
-      rubyText,
-      textContent,
-    })
 
     if (textContent.trim() === '') {
       this.remove()

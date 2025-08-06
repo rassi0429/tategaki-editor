@@ -78,7 +78,7 @@ function TategakiEditor({
           />
           <HistoryPlugin />
           <CurrentInfo />
-          <PageBreakPlugin />
+          <PageBreakPlugin maxWidth={350} />
           <CustomOnChangePlugin
             {...((onChange ?? onSave) && { onChange: onChange ?? onSave })}
             {...((initialEditorState || initialContent) && {

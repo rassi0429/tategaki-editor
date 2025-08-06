@@ -1,8 +1,13 @@
-import { type ReactNode, useEffect, useRef, useState } from 'react'
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection'
-import { mergeRegister } from '@lexical/utils'
 import {
   $applyNodeReplacement,
   $getSelection,
@@ -14,7 +19,6 @@ import {
   type NodeKey,
   type SerializedLexicalNode,
   type Spread,
-  createCommand,
 } from 'lexical'
 
 // RubyNodeのシリアライズ形式
@@ -27,8 +31,6 @@ export type SerializedRubyNode = Spread<
   },
   SerializedLexicalNode
 >
-
-export const CLICK_COMMAND = createCommand<MouseEvent>('CLICK_COMMAND')
 
 // ルビタグをレンダリングするためのReactコンポーネント
 function RubyComponent({
@@ -44,11 +46,28 @@ function RubyComponent({
   const [isSelected, setSelected, clearSelection] =
     useLexicalNodeSelection(nodeKey)
   const [isEditing, setIsEditing] = useState(false)
+  const wrapperRef = useRef<HTMLSpanElement>(null)
+  const baseInputRef = useRef<HTMLInputElement>(null)
+  const rubyInputRef = useRef<HTMLInputElement>(null)
+
   const [baseText, setBaseText] = useState(initialBaseText)
   const [rubyText, setRubyText] = useState(initialRubyText)
-  const inputRef = useRef<HTMLInputElement | null>(null)
 
-  const handleSave = () => {
+  useEffect(() => {
+    if (!isEditing) {
+      setBaseText(initialBaseText)
+      setRubyText(initialRubyText)
+    }
+  }, [initialBaseText, initialRubyText, isEditing])
+
+  const handleSave = useCallback(() => {
+    if (!isEditing) return
+    setIsEditing(false)
+
+    if (baseText === initialBaseText && rubyText === initialRubyText) {
+      return
+    }
+
     editor.update(() => {
       const node = editor.getEditorState()._nodeMap.get(nodeKey)
       if ($isRubyNode(node)) {
@@ -56,60 +75,92 @@ function RubyComponent({
         node.setRubyText(rubyText)
       }
     })
-    setIsEditing(false)
-  }
+  }, [editor, isEditing, baseText, rubyText, initialBaseText, initialRubyText, nodeKey])
 
   useEffect(() => {
     if (isEditing) {
-      inputRef.current?.focus()
+      baseInputRef.current?.select()
     }
   }, [isEditing])
 
   useEffect(() => {
-    return mergeRegister(
-      editor.registerCommand(
-        CLICK_COMMAND,
-        (payload) => {
-          const event = payload as MouseEvent
-          if (event.target === inputRef.current) {
-            return false
-          }
-          if (isSelected) {
-            setIsEditing(true)
-            return true
-          }
-          return false
-        },
-        1
-      )
-    )
-  }, [editor, isSelected])
+    if (!isEditing) return
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(event.target as Node)
+      ) {
+        handleSave()
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isEditing, handleSave])
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      handleSave()
+    } else if (event.key === 'Escape') {
+      event.preventDefault()
+      setIsEditing(false)
+    }
+  }
 
   if (isEditing) {
     return (
-      <span ref={inputRef}>
-        <input
-          type="text"
-          value={baseText}
-          onChange={(e) => setBaseText(e.target.value)}
-          style={{ width: '5em' }}
-        />
-        <input
-          type="text"
-          value={rubyText}
-          onChange={(e) => setRubyText(e.target.value)}
-          style={{ width: '5em' }}
-        />
-        <button type="button" onClick={handleSave}>
-          Save
-        </button>
+      <span
+        ref={wrapperRef}
+        style={{ display: 'inline-block', verticalAlign: 'text-top' }}
+        aria-label="ルビ編集フォーム"
+      >
+        <ruby
+          className={isSelected ? 'selected editing' : 'editing'}
+          data-lexical-decorator="true"
+        >
+          <input
+            ref={baseInputRef}
+            value={baseText}
+            onChange={(e) => setBaseText(e.target.value)}
+            onKeyDown={handleKeyDown}
+            size={baseText.length > 1 ? baseText.length : 1}
+            style={{
+              border: 'none',
+              outline: 'none',
+              background: 'transparent',
+              font: 'inherit',
+              color: 'inherit',
+              textAlign: 'center',
+            }}
+          />
+          <rt>
+            <input
+              ref={rubyInputRef}
+              value={rubyText}
+              onChange={(e) => setRubyText(e.target.value)}
+              onKeyDown={handleKeyDown}
+              size={rubyText.length > 1 ? rubyText.length : 1}
+              style={{
+                border: 'none',
+                outline: 'none',
+                background: 'transparent',
+                font: 'inherit',
+                color: 'inherit',
+                fontSize: '0.5em',
+                textAlign: 'center',
+              }}
+            />
+          </rt>
+        </ruby>
       </span>
     )
   }
 
   return (
     <ruby
-      ref={inputRef}
       data-lexical-decorator="true"
       data-lexical-node-key={nodeKey}
       className={isSelected ? 'selected' : ''}

@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
+  $createTextNode,
   type EditorConfig,
   ElementNode,
   type LexicalEditor,
@@ -125,6 +126,22 @@ export class RubyNode extends ElementNode {
   setRubyText(newRubyText: string) {
     const writable = this.getWritable()
     writable.__rubyText = newRubyText
+    this._checkAndReplaceWithTextNode()
+  }
+
+  _checkAndReplaceWithTextNode() {
+    const rubyText = this.getRubyText()
+    const children = this.getChildren()
+
+    if (rubyText.trim() === '' || children.length === 0) {
+      const textContent = this.getTextContent()
+      if (textContent.trim() !== '') {
+        const textNode = $createTextNode(textContent)
+        this.replace(textNode)
+      } else {
+        this.remove()
+      }
+    }
   }
 
   getRubyText(): string {
@@ -133,6 +150,38 @@ export class RubyNode extends ElementNode {
 
   isInline(): boolean {
     return true
+  }
+
+  insertAfter(nodeToInsert: LexicalNode): LexicalNode {
+    const result = super.insertAfter(nodeToInsert)
+    this._checkAndReplaceWithTextNode()
+    return result
+  }
+
+  insertBefore(nodeToInsert: LexicalNode): LexicalNode {
+    const result = super.insertBefore(nodeToInsert)
+    this._checkAndReplaceWithTextNode()
+    return result
+  }
+
+  remove(): void {
+    this._checkAndReplaceWithTextNode()
+  }
+
+  clear(): this {
+    const result = super.clear()
+    this._checkAndReplaceWithTextNode()
+    return result
+  }
+
+  splice(
+    start: number,
+    deleteCount: number,
+    nodesToInsert: LexicalNode[]
+  ): this {
+    super.splice(start, deleteCount, nodesToInsert)
+    this._checkAndReplaceWithTextNode()
+    return this
   }
 }
 

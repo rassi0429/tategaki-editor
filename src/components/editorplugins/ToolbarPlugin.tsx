@@ -58,7 +58,9 @@ export default function ToolbarPlugin() {
     )
   }, [editor, updateToolbar])
 
-  const replaceSelectionWithNode = (nodeCreator: (text: string) => LexicalNode) => {
+  const replaceSelectionWithNode = (
+    nodeCreator: (text: string) => LexicalNode
+  ) => {
     const selection = $getSelection()
     if ($isRangeSelection(selection) && !selection.isCollapsed()) {
       const selectedText = selection.getTextContent()
@@ -81,7 +83,7 @@ export default function ToolbarPlugin() {
     editor.update(() => {
       const selection = $getSelection()
       if ($isRangeSelection(selection)) {
-          $setBlocksType(selection, () => $createHeadingNode(headingSize))
+        $setBlocksType(selection, () => $createHeadingNode(headingSize))
       }
     })
   }

@@ -22,22 +22,22 @@ export type SerializedRubyNode = Spread<
 >
 
 function waitForElement(element: Element) {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     if (element.isConnected) {
-      resolve(element);
-      return;
+      resolve(element)
+      return
     }
 
     const observer = new MutationObserver(() => {
-      observer.disconnect();
-      resolve(element);
-    });
+      observer.disconnect()
+      resolve(element)
+    })
 
     observer.observe(document.body, {
       childList: true,
-      subtree: true
-    });
-  });
+      subtree: true,
+    })
+  })
 }
 
 // RubyNode クラス
@@ -94,7 +94,7 @@ export class RubyNode extends ElementNode {
     const element = document.createElement('ruby')
 
     element.addEventListener('click', (event) => {
-      if (!(event.target instanceof Node && event.target.nodeName === "RT")) {
+      if (!(event.target instanceof Node && event.target.nodeName === 'RT')) {
         return
       }
       event.preventDefault()
@@ -108,10 +108,11 @@ export class RubyNode extends ElementNode {
     })
 
     // elementがDOMに繋がった = DOM構築が完了したとき・・・だと思うが、エラーになる
-    waitForElement(element).then(() => (
+    waitForElement(element).then(() =>
       editor.update(() => {
         this._updateRtElement(element)
-      })))
+      })
+    )
 
     return element
   }

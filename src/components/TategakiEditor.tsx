@@ -14,6 +14,10 @@ import PageBreakPlugin from '@/components/editorplugins/PageBreakPlugin.tsx'
 import * as styles from './TategakiEditor.css'
 import CurrentInfo from './editorplugins/CurrentInfo'
 import { RubyNode, RubyPlugin } from './editorplugins/RubyNode'
+import {
+  TateChuYokoNode,
+  TateChuYokoPlugin,
+} from './editorplugins/TateChuYokoNode'
 
 interface TategakiEditorProps {
   initialContent?: string
@@ -33,7 +37,7 @@ function TategakiEditor({
   const initialConfig = {
     namespace: 'TategakiEditor',
     theme: styles.theme,
-    nodes: [HeadingNode, QuoteNode, RubyNode],
+    nodes: [HeadingNode, QuoteNode, RubyNode, TateChuYokoNode],
     onError(error: Error) {
       console.error('Lexical error:', error)
     },
@@ -78,6 +82,7 @@ function TategakiEditor({
       <LexicalComposer initialConfig={initialConfig}>
         <ToolbarPlugin />
         <RubyPlugin />
+        <TateChuYokoPlugin />
         <NewLineVisibilityPlugin />
         <div className={styles.editor} ref={editorRef}>
           <RichTextPlugin

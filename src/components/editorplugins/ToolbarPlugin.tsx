@@ -14,6 +14,7 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 
 import { $createRubyNode } from './RubyNode'
+import { $createTateChuYokoNode } from './TateChuYokoNode'
 import * as styles from './ToolbarPlugin.css'
 
 interface ToolbarState {
@@ -108,6 +109,12 @@ export default function ToolbarPlugin() {
     })
   }
 
+  const formatTateChuYoko = () => {
+    editor.update(() => {
+      replaceSelectionWithNode(() => $createTateChuYokoNode())
+    })
+  }
+
   return (
     <div className={styles.toolbar}>
       <div className={styles.toolbarSection}>
@@ -198,6 +205,14 @@ export default function ToolbarPlugin() {
           aria-label="ルビ"
         >
           ルビ
+        </button>
+        <button
+          type="button"
+          className={styles.toolbarButton}
+          onClick={() => formatTateChuYoko()}
+          aria-label="縦中横"
+        >
+          縦中横
         </button>
       </div>
     </div>

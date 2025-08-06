@@ -38,7 +38,6 @@ export const input = style({
 
   /* Japanese text styling */
   fontFamily: "'Noto Serif JP', sans-serif",
-  fontFeatureSettings: '"vert" 1',
 
   /* Text flow */
   overflowX: 'scroll',

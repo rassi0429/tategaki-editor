@@ -14,5 +14,6 @@ export const pageBreakIndicator = style({
     fontSize: '10px',
     color: '#999',
     whiteSpace: 'nowrap',
+    textOrientation: 'upright',
   },
 })

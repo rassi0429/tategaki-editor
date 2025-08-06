@@ -22,25 +22,6 @@ export type SerializedRubyNode = Spread<
   SerializedElementNode
 >
 
-function waitForElement(element: Element) {
-  return new Promise((resolve) => {
-    if (element.isConnected) {
-      resolve(element)
-      return
-    }
-
-    const observer = new MutationObserver(() => {
-      observer.disconnect()
-      resolve(element)
-    })
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    })
-  })
-}
-
 // RubyNode クラス
 export class RubyNode extends ElementNode {
   __rubyText: string
@@ -75,7 +56,7 @@ export class RubyNode extends ElementNode {
     }
   }
 
-  _updateRtElement(dom: HTMLElement): void {
+  _updateRtElement(dom: HTMLElement): Element {
     const newRubyText = this.getRubyText()
     let rtElement = dom.querySelector('rt')
 
@@ -89,6 +70,8 @@ export class RubyNode extends ElementNode {
     if (rtElement.innerText !== newRubyText) {
       rtElement.innerText = newRubyText
     }
+
+    return rtElement
   }
 
   createDOM(_config: EditorConfig, editor: LexicalEditor): HTMLElement {
@@ -107,13 +90,12 @@ export class RubyNode extends ElementNode {
         }
       })
     })
+    this._updateRtElement(element)
 
-    // elementがDOMに繋がった = DOM構築が完了したとき・・・だと思うが、エラーになる
-    waitForElement(element).then(() =>
-      editor.update(() => {
-        this._updateRtElement(element)
-      })
-    )
+    // __lexicalLineBreakプロパティに入れておくとその前に子要素が入るようだが詳細は未確認
+    ;(
+      element as unknown as { __lexicalLineBreak: Element }
+    ).__lexicalLineBreak = this._updateRtElement(element)
 
     return element
   }
@@ -131,16 +113,21 @@ export class RubyNode extends ElementNode {
 
   _checkAndReplaceWithTextNode() {
     const rubyText = this.getRubyText()
-    const children = this.getChildren()
+    const textContent = this.getTextContent()
 
-    if (rubyText.trim() === '' || children.length === 0) {
-      const textContent = this.getTextContent()
-      if (textContent.trim() !== '') {
-        const textNode = $createTextNode(textContent)
-        this.replace(textNode)
-      } else {
-        this.remove()
-      }
+    console.log('Checking RubyNode:', {
+      rubyText,
+      textContent,
+    })
+
+    if (textContent.trim() === '') {
+      this.remove()
+      return
+    }
+
+    if (rubyText.trim() === '') {
+      const textNode = $createTextNode(textContent)
+      this.replace(textNode)
     }
   }
 
@@ -162,10 +149,6 @@ export class RubyNode extends ElementNode {
     const result = super.insertBefore(nodeToInsert)
     this._checkAndReplaceWithTextNode()
     return result
-  }
-
-  remove(): void {
-    this._checkAndReplaceWithTextNode()
   }
 
   clear(): this {

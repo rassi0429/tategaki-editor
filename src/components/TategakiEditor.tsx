@@ -53,9 +53,12 @@ function TategakiEditor({
         if (wheelEvent.deltaY < 0) return -1
         return 1
       })()
-      const distance = direction * Math.sqrt(
-        wheelEvent.deltaX * wheelEvent.deltaX + wheelEvent.deltaY * wheelEvent.deltaY
-      )
+      const distance =
+        direction *
+        Math.sqrt(
+          wheelEvent.deltaX * wheelEvent.deltaX +
+            wheelEvent.deltaY * wheelEvent.deltaY
+        )
       editorElement.scrollLeft -= distance
     }
 

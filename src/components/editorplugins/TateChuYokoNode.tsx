@@ -24,8 +24,9 @@ export class TateChuYokoNode extends ElementNode {
     return 'tate-chu-yoko'
   }
 
-
-  static importJSON(serializedNode: SerializedTateChuYokoNode): TateChuYokoNode {
+  static importJSON(
+    serializedNode: SerializedTateChuYokoNode
+  ): TateChuYokoNode {
     const node = $createTateChuYokoNode()
     node.setFormat(serializedNode.format)
     node.setIndent(serializedNode.indent)
@@ -73,7 +74,9 @@ export const TateChuYokoPlugin = (): JSX.Element | null => {
   const [editor] = useLexicalComposerContext()
   useEffect(() => {
     if (!editor.hasNode(TateChuYokoNode)) {
-      throw new Error('TateChuYokoPlugin: TateChuYokoNode not registered on editor')
+      throw new Error(
+        'TateChuYokoPlugin: TateChuYokoNode not registered on editor'
+      )
     }
   }, [editor])
   return null

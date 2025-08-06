@@ -14,7 +14,7 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 
 import { $createRubyNode } from './RubyNode'
-import { $createTateChuYokoNode } from './TateChuYokoNode'
+import { $createTateChuYokoNode, $isTateChuYokoNode } from './TateChuYokoNode'
 import * as styles from './ToolbarPlugin.css'
 
 interface ToolbarState {
@@ -111,7 +111,32 @@ export default function ToolbarPlugin() {
 
   const formatTateChuYoko = () => {
     editor.update(() => {
-      replaceSelectionWithNode(() => $createTateChuYokoNode())
+      const selection = $getSelection()
+      if ($isRangeSelection(selection)) {
+        // 現在の選択が縦中横ノード内にあるかチェック
+        const nodes = selection.getNodes()
+        let tateChuYokoNode = null
+
+        for (const node of nodes) {
+          const parent = node.getParent()
+          if ($isTateChuYokoNode(parent)) {
+            tateChuYokoNode = parent
+            break
+          }
+        }
+
+        if (tateChuYokoNode) {
+          // 縦中横ノードをTextNodeに戻す
+          const textContent = tateChuYokoNode.getTextContent()
+          const newTextNode = $createTextNode(textContent)
+          tateChuYokoNode.replace(newTextNode)
+          // 新しいノードに選択を移動
+          newTextNode.select()
+        } else {
+          // 通常の縦中横作成処理
+          replaceSelectionWithNode(() => $createTateChuYokoNode())
+        }
+      }
     })
   }
 

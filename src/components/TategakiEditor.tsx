@@ -47,8 +47,8 @@ function TategakiEditor({
       const wheelEvent = event as WheelEvent
       wheelEvent.preventDefault()
       const direction: -1 | 1 = (() => {
-        if (wheelEvent.deltaX > 0) return 1
-        if (wheelEvent.deltaX < 0) return -1
+        if (wheelEvent.deltaX < 0) return 1
+        if (wheelEvent.deltaX > 0) return -1
         if (wheelEvent.deltaY > 0) return 1
         if (wheelEvent.deltaY < 0) return -1
         return 1

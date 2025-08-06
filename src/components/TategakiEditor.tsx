@@ -1,23 +1,17 @@
-import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
-import { HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { useEffect, useRef } from 'react'
 
 import CustomOnChangePlugin from '@/components/editorplugins/CustomOnChangePlugin'
 import NewLineVisibilityPlugin from '@/components/editorplugins/NewLineVisibilityPlugin'
-import ToolbarPlugin from '@/components/editorplugins/ToolbarPlugin'
 
 import PageBreakPlugin from '@/components/editorplugins/PageBreakPlugin.tsx'
 import * as styles from './TategakiEditor.css'
 import CurrentInfo from './editorplugins/CurrentInfo'
-import { RubyNode, RubyPlugin } from './editorplugins/RubyNode'
-import {
-  TateChuYokoNode,
-  TateChuYokoPlugin,
-} from './editorplugins/TateChuYokoNode'
+import { RubyPlugin } from './editorplugins/RubyNode'
+import { TateChuYokoPlugin } from './editorplugins/TateChuYokoNode'
 
 interface TategakiEditorProps {
   initialContent?: string
@@ -33,15 +27,6 @@ function TategakiEditor({
   initialContent,
 }: TategakiEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null)
-
-  const initialConfig = {
-    namespace: 'TategakiEditor',
-    theme: styles.theme,
-    nodes: [HeadingNode, QuoteNode, RubyNode, TateChuYokoNode],
-    onError(error: Error) {
-      console.error('Lexical error:', error)
-    },
-  }
 
   useEffect(() => {
     const editorElement = editorRef.current?.children[0] as HTMLElement
@@ -79,37 +64,34 @@ function TategakiEditor({
 
   return (
     <div className={styles.container}>
-      <LexicalComposer initialConfig={initialConfig}>
-        <ToolbarPlugin />
-        <RubyPlugin />
-        <TateChuYokoPlugin />
-        <NewLineVisibilityPlugin />
-        <div className={styles.editor} ref={editorRef}>
-          <RichTextPlugin
-            contentEditable={<ContentEditable className={styles.input} />}
-            placeholder={
-              <div className={styles.placeholder}>
-                <ruby>
-                  縦書き<rp>(</rp>
-                  <rt>たてがき</rt>
-                  <rp>)</rp>
-                </ruby>
-                テキストを入力してください...
-              </div>
-            }
-            ErrorBoundary={LexicalErrorBoundary}
-          />
-          <HistoryPlugin />
-          <CurrentInfo />
-          <PageBreakPlugin maxWidth={350} />
-          <CustomOnChangePlugin
-            {...((onChange ?? onSave) && { onChange: onChange ?? onSave })}
-            {...((initialEditorState || initialContent) && {
-              initString: initialEditorState || initialContent,
-            })}
-          />
-        </div>
-      </LexicalComposer>
+      <RubyPlugin />
+      <TateChuYokoPlugin />
+      <NewLineVisibilityPlugin />
+      <div className={styles.editor} ref={editorRef}>
+        <RichTextPlugin
+          contentEditable={<ContentEditable className={styles.input} />}
+          placeholder={
+            <div className={styles.placeholder}>
+              <ruby>
+                縦書き<rp>(</rp>
+                <rt>たてがき</rt>
+                <rp>)</rp>
+              </ruby>
+              テキストを入力してください...
+            </div>
+          }
+          ErrorBoundary={LexicalErrorBoundary}
+        />
+        <HistoryPlugin />
+        <CurrentInfo />
+        <PageBreakPlugin maxWidth={350} />
+        <CustomOnChangePlugin
+          {...((onChange ?? onSave) && { onChange: onChange ?? onSave })}
+          {...((initialEditorState || initialContent) && {
+            initString: initialEditorState || initialContent,
+          })}
+        />
+      </div>
     </div>
   )
 }

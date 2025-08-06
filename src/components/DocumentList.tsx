@@ -449,6 +449,26 @@ export const DocumentList: React.FC<DocumentListProps> = ({
           </table>
         </div>
       )}
+
+      <footer className={styles.footer}>
+        <div className={styles.footerContent}>
+          <div className={styles.footerSection}>
+            <a
+              href="https://github.com/rassi0429/tategaki-editor"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.footerLink}
+            >
+              GitHub Repository
+            </a>
+          </div>
+          <div className={styles.footerSection}>
+            <span className={styles.footerText}>
+              Released under the MIT License
+            </span>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

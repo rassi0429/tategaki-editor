@@ -54,7 +54,7 @@ export class AuthorNode extends ElementNode {
     }
 
     createDOM(): HTMLElement {
-        const element = document.createElement('span')
+        const element = document.createElement('div')
         element.className = styles.authorName
         element.textContent = this.__authorText
         return element

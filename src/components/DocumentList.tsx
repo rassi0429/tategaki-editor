@@ -2,6 +2,7 @@ import type React from 'react'
 import { useEffect, useState } from 'react'
 import {
   type Document,
+  countCharacter,
   createDocument,
   deleteDocument,
   generateUUID,
@@ -94,7 +95,7 @@ export const DocumentList: React.FC<DocumentListProps> = ({
     try {
       const json = JSON.parse(content)
       const text = extractTextFromLexicalJSON(json)
-      return text.length
+      return countCharacter(text)
     } catch {
       return 0
     }

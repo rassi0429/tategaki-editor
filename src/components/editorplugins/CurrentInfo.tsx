@@ -1,6 +1,8 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $getRoot } from 'lexical'
 import { useEffect, useState } from 'react'
+import { countCharacter } from '../../utils/documentManager'
+
 import * as styles from './CurrentInfo.css'
 
 function CurrentInfo() {
@@ -13,7 +15,7 @@ function CurrentInfo() {
       editor.getEditorState().read(() => {
         const root = $getRoot()
         const textContent = root.getTextContent()
-        setCharacterCount(textContent.length)
+        setCharacterCount(countCharacter(textContent))
         setLineCount(textContent.split('\n').length)
       })
     })
@@ -22,7 +24,7 @@ function CurrentInfo() {
       const root = $getRoot()
       const textContent = root.getTextContent()
       const _lineCount = textContent.split('\n').length
-      setCharacterCount(textContent.length)
+      setCharacterCount(countCharacter(textContent))
       setLineCount(_lineCount)
     })
 

@@ -84,3 +84,9 @@ export const getDocument = (id: string): Document | null => {
   const documents = getDocuments()
   return documents.find((doc) => doc.id === id) || null
 }
+
+export const countCharacter = (text: string): number => {
+  // 正規表現で空白文字を除去してから文字数カウントを行う
+  const re = /\s/g
+  return text.replace(re, '').length
+}

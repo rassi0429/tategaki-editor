@@ -16,6 +16,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { $createRubyNode } from './RubyNode'
 import { $createTateChuYokoNode, $isTateChuYokoNode } from './TateChuYokoNode'
 import * as styles from './ToolbarPlugin.css'
+import {$createAuthorNode} from "@/components/editorplugins/AuthorNode.tsx";
 
 interface ToolbarState {
   isBold: boolean
@@ -140,6 +141,22 @@ export default function ToolbarPlugin() {
     })
   }
 
+  //次の行に著者名を挿入する
+  const formatAuthorName = () => {
+    editor.update(() => {
+        const authorText = prompt('著者名を入力してください:', '')
+        if (authorText === null || authorText.trim() === '') {
+            return
+        }
+        const authorNode = $createAuthorNode(authorText)
+        const selection = $getSelection()
+        if ($isRangeSelection(selection)) {
+            // 現在の選択位置に著者名ノードを挿入
+            selection.insertNodes([authorNode])
+        }
+    })
+  }
+
   return (
     <div className={styles.toolbar}>
       <div className={styles.toolbarSection}>
@@ -238,6 +255,14 @@ export default function ToolbarPlugin() {
           aria-label="本文小"
         >
           本文小
+        </button>
+        <button
+          type="button"
+            className={styles.toolbarButton}
+            onClick={() => formatAuthorName()}
+            aria-label="著者名"
+        >
+          著者名
         </button>
       </div>
     </div>

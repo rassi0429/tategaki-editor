@@ -7,6 +7,7 @@ import {
   getDocument,
   updateDocument,
 } from '../utils/documentManager'
+import { getSettings, updateSettings } from '../utils/settingsManager'
 import * as styles from './EditorPage.css'
 import TategakiEditor from './TategakiEditor'
 import * as editorStyles from './TategakiEditor.css'
@@ -25,6 +26,7 @@ export const EditorPage: React.FC<EditorPageProps> = ({
 }) => {
   const [document, setDocument] = useState<Document | null>(null)
   const [title, setTitle] = useState('')
+  const [showPageBreak, setShowPageBreak] = useState(true)
 
   useEffect(() => {
     const doc = getDocument(documentId)
@@ -32,6 +34,10 @@ export const EditorPage: React.FC<EditorPageProps> = ({
       setDocument(doc)
       setTitle(doc.title)
     }
+
+    // Load settings
+    const settings = getSettings()
+    setShowPageBreak(settings.showPageBreak)
   }, [documentId])
 
   const handleSave = (content: string) => {
@@ -41,6 +47,12 @@ export const EditorPage: React.FC<EditorPageProps> = ({
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value)
     updateDocument(documentId, { title: e.target.value })
+  }
+
+  const handleTogglePageBreak = () => {
+    const newValue = !showPageBreak
+    setShowPageBreak(newValue)
+    updateSettings({ showPageBreak: newValue })
   }
 
   if (!document) {
@@ -73,8 +85,29 @@ export const EditorPage: React.FC<EditorPageProps> = ({
           <div className={styles.toolbarContainer}>
             <ToolbarPlugin />
           </div>
+          <div className={styles.settingsContainer}>
+            <label className={styles.settingsLabel} htmlFor="pageBreakToggle">
+              改ページ線
+            </label>
+            <label className={styles.toggleSwitch} htmlFor="pageBreakToggle">
+              <input
+                id="pageBreakToggle"
+                type="checkbox"
+                className={styles.toggleInput}
+                checked={showPageBreak}
+                onChange={handleTogglePageBreak}
+              />
+              <span
+                className={`${styles.toggleSlider} ${styles.toggleInputChecked}`}
+              />
+            </label>
+          </div>
         </div>
-        <TategakiEditor initialContent={document.content} onSave={handleSave} />
+        <TategakiEditor
+          initialContent={document.content}
+          onSave={handleSave}
+          showPageBreak={showPageBreak}
+        />
       </LexicalComposer>
     </div>
   )

@@ -68,6 +68,17 @@ function PageBreakPlugin({
     return () => {
       removeListener()
       window.removeEventListener('resize', handleResize)
+
+      // Cleanup: Remove all page break indicators when plugin unmounts
+      const editorContainer = editor.getRootElement()
+      if (editorContainer) {
+        const elements = editorContainer.querySelectorAll(
+          `.${pageBreakIndicator}`
+        )
+        for (const el of elements) {
+          el.classList.remove(pageBreakIndicator)
+        }
+      }
     }
   }, [editor, calculateNodePositions])
 

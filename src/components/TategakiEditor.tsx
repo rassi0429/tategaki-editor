@@ -18,6 +18,7 @@ interface TategakiEditorProps {
   onSave?: (content: string) => void
   initialEditorState?: string
   onChange?: (content: string) => void
+  showPageBreak?: boolean
 }
 
 function TategakiEditor({
@@ -25,6 +26,7 @@ function TategakiEditor({
   onSave,
   initialEditorState,
   initialContent,
+  showPageBreak = true,
 }: TategakiEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null)
 
@@ -84,7 +86,7 @@ function TategakiEditor({
         />
         <HistoryPlugin />
         <CurrentInfo />
-        <PageBreakPlugin maxWidth={350} />
+        {showPageBreak && <PageBreakPlugin maxWidth={350} />}
         <CustomOnChangePlugin
           {...((onChange ?? onSave) && { onChange: onChange ?? onSave })}
           {...((initialEditorState || initialContent) && {

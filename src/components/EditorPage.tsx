@@ -14,6 +14,7 @@ import * as editorStyles from './TategakiEditor.css'
 import { RubyNode } from './editorplugins/RubyNode'
 import { TateChuYokoNode } from './editorplugins/TateChuYokoNode'
 import ToolbarPlugin from './editorplugins/ToolbarPlugin'
+import {AuthorNode} from "@/components/editorplugins/AuthorNode.tsx";
 
 interface EditorPageProps {
   documentId: string
@@ -62,7 +63,7 @@ export const EditorPage: React.FC<EditorPageProps> = ({
   const initialConfig = {
     namespace: 'TategakiEditor',
     theme: editorStyles.theme,
-    nodes: [HeadingNode, QuoteNode, RubyNode, TateChuYokoNode],
+    nodes: [HeadingNode, QuoteNode, RubyNode, TateChuYokoNode, AuthorNode],
     onError(error: Error) {
       console.error('Lexical error:', error)
     },
